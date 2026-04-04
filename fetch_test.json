@@ -1,0 +1,154 @@
+{
+  "type": "animals",
+  "id": "10007851",
+  "attributes": {
+    "isAdoptionPending": false,
+    "ageGroup": "Senior",
+    "ageString": "11 Years 10 Months",
+    "birthDate": "2014-06-01T00:00:00Z",
+    "isBirthDateExact": false,
+    "breedString": "Domestic Short Hair / Domestic Medium Hair (short coat)",
+    "breedPrimary": "Domestic Short Hair",
+    "breedPrimaryId": 35,
+    "breedSecondary": "Domestic Medium Hair",
+    "breedSecondaryId": 29,
+    "coatLength": "Short",
+    "isCourtesyListing": false,
+    "descriptionText": "Meet Zelda.A sweet senior with star quality.Zelda is a gorgeous, brown domestic shorthair who has truly mastered the art of being adored&#226;€”and she&#226;€™s more than happy to return the favor. This well-socialized senior loves attention and will gladly soak up pets, praise, and quality time like it&#226;€™s her full-time job.She&#226;€™s confident, gentle, and easy to love, with a calm charm that makes her a joy to be around. Feeling adventurous? Zelda wouldn&#226;€™t mind a stroller stroll, taking in the sights while enjoying being your favorite passenger.If you&#226;€™re looking for a loving, affectionate companion who&#226;€™s ready to be spoiled, Zelda is prepared to step right into your heart (and maybe your stroller).",
+    "isNeedingFoster": false,
+    "isFound": false,
+    "priority": 10,
+    "name": "Zelda",
+    "pictureCount": 13,
+    "pictureThumbnailUrl": "https://cdn.rescuegroups.org/6685/pictures/animals/10007/10007851/99403654.jpg?width=100",
+    "rescueId": "-24015",
+    "searchString": "Zelda   Brown Female  -24015  Cats Domestic Short Hair / Domestic Medium Hair (short coat)s",
+    "sex": "Female",
+    "sizeCurrent": 9.810600280761719,
+    "sizeUOM": "Pounds",
+    "slug": "adopt-zelda-domestic-short-hair-cat",
+    "isSponsorable": false,
+    "videoCount": 0,
+    "videoUrlCount": 0,
+    "createdDate": "2016-05-16T04:52:51Z",
+    "updatedDate": "2026-04-02T21:09:20Z"
+  },
+  "relationships": {
+    "breeds": {
+      "data": [
+        {
+          "type": "breeds",
+          "id": "35"
+        },
+        {
+          "type": "breeds",
+          "id": "29"
+        }
+      ]
+    },
+    "colors": {
+      "data": [
+        {
+          "type": "colors",
+          "id": "7"
+        }
+      ]
+    },
+    "patterns": {
+      "data": [
+        {
+          "type": "patterns",
+          "id": "8"
+        }
+      ]
+    },
+    "species": {
+      "data": [
+        {
+          "type": "species",
+          "id": "3"
+        }
+      ]
+    },
+    "statuses": {
+      "data": [
+        {
+          "type": "statuses",
+          "id": "1"
+        }
+      ]
+    },
+    "locations": {
+      "data": [
+        {
+          "type": "locations",
+          "id": "1000006685"
+        }
+      ]
+    },
+    "orgs": {
+      "data": [
+        {
+          "type": "orgs",
+          "id": "6685"
+        }
+      ]
+    },
+    "pictures": {
+      "data": [
+        {
+          "type": "pictures",
+          "id": "89880808"
+        },
+        {
+          "type": "pictures",
+          "id": "64712501"
+        },
+        {
+          "type": "pictures",
+          "id": "67676009"
+        },
+        {
+          "type": "pictures",
+          "id": "68630068"
+        },
+        {
+          "type": "pictures",
+          "id": "68630069"
+        },
+        {
+          "type": "pictures",
+          "id": "72562111"
+        },
+        {
+          "type": "pictures",
+          "id": "72562112"
+        },
+        {
+          "type": "pictures",
+          "id": "74856660"
+        },
+        {
+          "type": "pictures",
+          "id": "74856662"
+        },
+        {
+          "type": "pictures",
+          "id": "77190293"
+        },
+        {
+          "type": "pictures",
+          "id": "78575079"
+        },
+        {
+          "type": "pictures",
+          "id": "97591461"
+        },
+        {
+          "type": "pictures",
+          "id": "99403654"
+        }
+      ]
+    }
+  }
+}

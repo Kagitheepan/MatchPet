@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model UserProfile {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  name            String?
+  location        String   // Code postal ou Ville
+  latitude        Float?
+  longitude       Float?
+  searchRadius    Int      @default(30) // Rayon en KM
+  hasGarden       Boolean  @default(false)
+  hasChildren     Boolean  @default(false)
+  hasOtherPets    Boolean  @default(false)
+  timeFree        String?  // Description du temps libre
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([latitude, longitude])
+}
+
+model Refuge {
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?  @db.Text
+  address         String
+  city            String
+  postalCode      String
+  latitude        Float
+  longitude       Float
+  phone           String?
+  email           String?
+  website         String?
+  animals         Animal[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([latitude, longitude])
+}
+
+model Animal {
+  id              Int      @id @default(autoincrement())
+  externalId      String   @unique // ID venant de RescueGroups.org
+  name            String
+  species         String   // Dog, Cat, etc.
+  breed           String?
+  age             String?
+  gender          String?
+  size            String?
+  description     String?  @db.Text
+  photos          Json?    // Tableau d'URLs d'images
+  
+  // Critères de matching
+  goodWithChildren Boolean @default(false)
+  goodWithDogs     Boolean @default(false)
+  goodWithCats     Boolean @default(false)
+  needsGarden      Boolean @default(false)
+  energyLevel      String?
+
+  refugeId        Int
+  refuge          Refuge   @relation(fields: [refugeId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([species, breed])
+}

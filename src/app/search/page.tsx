@@ -1,26 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Search as SearchIcon, MapPin, Heart, Filter, ChevronDown } from "lucide-react";
+import { Search as SearchIcon, MapPin, Heart, Filter, ChevronDown, Loader2 } from "lucide-react";
 import DesktopScene from "@/components/3d/DesktopScene";
 import { Button } from "@/components/ui/Button";
-
-// Dummy data
-const INVENTORY = [
-  { id: "1", type: "chat", name: "Neige", breed: "Européen", age: "3 ans", desc: "Douce, câline, castrée. Un vrai amour au quotidien.", location: "Montereau (5 km)", image: "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=500" },
-  { id: "2", type: "chien", name: "Max", breed: "Border Collie", age: "7.5 ans", desc: "Joueur, affectueux. Parfait pour de grandes balades.", location: "Melun (12 km)", image: "https://images.unsplash.com/photo-1517423440428-a5a00ad493e8?w=500" },
-  { id: "3", type: "oiseau", name: "Pirou", breed: "Perruche ondulée", age: "1 an", desc: "Bavarde, curieuse de tout ce qui se passe.", location: "Fontainebleau (20 km)", image: "https://images.unsplash.com/photo-1542385151-efd0f074d3ea?w=500" },
-  { id: "4", type: "lapin", name: "Noisette", breed: "Lapin Nain Bélier", age: "2 ans", desc: "Très calme et propre. Habitué à la vie d'intérieur.", location: "Nemours (25 km)", image: "https://images.unsplash.com/photo-1585110396000-c9faf4e48023?w=500" },
-  { id: "5", type: "chat", name: "Simba", breed: "Main Coon", age: "4 ans", desc: "Indépendant mais majestueux. Câlin à ses heures.", location: "Sens (40 km)", image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=500" },
-  { id: "6", type: "chien", name: "Louna", breed: "Golden Retriever", age: "6 mois", desc: "Pleine d'énergie, demande beaucoup de temps pour l'éducation.", location: "Montereau (2 km)", image: "https://images.unsplash.com/photo-1552053831-71594a27632d?w=500" },
-];
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeType, setActiveType] = useState<string>("all");
+  const [animals, setAnimals] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = INVENTORY.filter(pet => {
+  useEffect(() => {
+    const fetchAnimals = async () => {
+      try {
+        const response = await fetch('/api/search');
+        if (!response.ok) throw new Error("Failed to fetch animals");
+        const data = await response.json();
+        
+        const mappedData = data.map((animal: any) => {
+          let type = "autre";
+          const speciesLower = animal.species?.toLowerCase() || '';
+          if (speciesLower.includes("dog")) type = "chien";
+          else if (speciesLower.includes("cat")) type = "chat";
+          else if (speciesLower.includes("bird")) type = "oiseau";
+          else if (speciesLower.includes("rabbit") || speciesLower.includes("small")) type = "lapin";
+
+          return {
+            id: animal.id.toString(),
+            type,
+            name: animal.name,
+            breed: animal.breed || animal.species,
+            age: animal.age || "?",
+            desc: animal.description || "Aucune description disponible.",
+            location: animal.refuge?.city || "Refuge",
+            image: (Array.isArray(animal.photos) && animal.photos.length > 0) 
+              ? animal.photos[0] 
+              : "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=500"
+          };
+        });
+        setAnimals(mappedData);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAnimals();
+  }, []);
+
+  const filtered = animals.filter(pet => {
     if (activeType !== "all" && pet.type !== activeType) return false;
     if (searchQuery && !pet.name.toLowerCase().includes(searchQuery.toLowerCase()) && !pet.breed.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
@@ -103,12 +133,15 @@ export default function SearchPage() {
         </div>
       </aside>
 
-      {/* Main Grid content */}
-      <div className="flex-1 w-full flex flex-col pb-10 min-w-0">
+        <div className="flex-1 w-full flex flex-col pb-10 min-w-0">
         <div className="hidden md:flex justify-between items-end mb-8 pl-2">
           <div>
             <h1 className="font-cursive text-[4rem] text-primary-dark font-bold tracking-tight leading-none">Explorer</h1>
-            <p className="text-gray-500 mt-2 font-semibold text-lg">{filtered.length} compagnon{filtered.length > 1 ? 's' : ''} trouvé{filtered.length > 1 ? 's' : ''}</p>
+            {loading ? (
+              <p className="text-gray-500 mt-2 font-semibold text-lg flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin"/> Chargement des animaux...</p>
+            ) : (
+              <p className="text-gray-500 mt-2 font-semibold text-lg">{filtered.length} compagnon{filtered.length > 1 ? 's' : ''} trouvé{filtered.length > 1 ? 's' : ''}</p>
+            )}
           </div>
           <button className="flex items-center gap-2 text-[15px] font-bold text-gray-500 hover:text-text-dark bg-white px-5 py-2.5 rounded-full border border-gray-200 shadow-sm transition-all hover:shadow-md">
             Trier par: Pertinence
@@ -117,7 +150,12 @@ export default function SearchPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full">
-          {filtered.map(pet => (
+          {loading && (
+            <div className="col-span-full py-20 flex justify-center items-center">
+              <Loader2 className="w-12 h-12 text-primary-dark animate-spin" />
+            </div>
+          )}
+          {!loading && filtered.map(pet => (
             <div key={pet.id} className="group flex flex-col bg-white rounded-[2rem] overflow-hidden shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 border border-transparent hover:border-gray-100 cursor-pointer md:hover:-translate-y-1">
               <div className="relative w-full h-[240px] md:h-[260px] overflow-hidden bg-gray-100">
                 <Image src={pet.image} alt={pet.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -143,7 +181,7 @@ export default function SearchPage() {
             </div>
           ))}
 
-          {filtered.length === 0 && (
+          {!loading && filtered.length === 0 && (
             <div className="col-span-full py-32 flex flex-col items-center justify-center text-center bg-white rounded-[3rem] border border-gray-50 shadow-sm">
               <div className="w-24 h-24 mb-6 relative opacity-20"><SearchIcon className="w-full h-full text-gray-400" /></div>
               <h3 className="font-cursive text-4xl font-bold text-text-dark mb-4">Aucun animal trouvé</h3>

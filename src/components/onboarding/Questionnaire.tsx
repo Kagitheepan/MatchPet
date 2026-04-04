@@ -69,22 +69,22 @@ const STEPS: StepData[] = [
     helperText: "Vous pouvez sélectionner plusieurs réponses.",
   },
   {
-    id: "desiredGender",
-    question: "De quel genre doit être votre compagnon ?",
+    id: "hasGarden",
+    question: "Avez-vous un jardin ?",
     type: "single",
     options: [
-      { label: "Mâle", value: "male" },
-      { label: "Femelle", value: "female" },
-      { label: "Pas d'importance", value: "any" },
+      { label: "Oui", value: "yes" },
+      { label: "Non", value: "no" },
     ],
-    helperText: "Vous ne pouvez sélectionner qu'une seule réponse.",
-  },
+    helperText: "Certains animaux ont besoin de se dégourdir les pattes en extérieur.",
+  }
 ];
 
 export default function Questionnaire() {
   const router = useRouter();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [loading, setLoading] = useState(false);
 
   const currentStep = STEPS[currentStepIndex];
   
@@ -105,14 +105,23 @@ export default function Questionnaire() {
       }
     } else {
       setAnswers({ ...answers, [currentStep.id]: value });
+      // For single choice, we could potentially auto-advance, but keeping manual next is safer
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStepIndex < STEPS.length - 1) {
       setCurrentStepIndex(prev => prev + 1);
     } else {
-      router.push("/match");
+      setLoading(true);
+      try {
+        localStorage.setItem("matchpet_answers", JSON.stringify(answers));
+        router.push(`/match`);
+      } catch (err) {
+        console.error("Error submitting profile:", err);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -153,29 +162,29 @@ export default function Questionnaire() {
               <p className="text-gray-500 mb-8 md:mb-8 text-[15px] md:text-lg font-medium leading-relaxed max-w-lg">{currentStep.helperText}</p>
               
               <div className="flex flex-col gap-3 overflow-y-auto no-scrollbar pb-6 mt-auto">
-                {currentStep.options.map((opt) => {
-                  const isSelected = 
-                    currentStep.type === "multiple" ? (answers[currentStep.id] as string[])?.includes(opt.value) : answers[currentStep.id] === opt.value;
-                  
-                  return (
-                    <button
-                      key={opt.value}
-                      onClick={() => handleSelect(opt.value)}
-                      className={`w-full p-4 md:p-5 text-left rounded-2xl md:rounded-[2rem] border-2 transition-all duration-200 flex items-center justify-between group
-                        ${isSelected ? 'border-primary-dark bg-primary/10 shadow-sm md:scale-[1.02]' : 'border-gray-100 bg-white hover:border-primary-dark hover:bg-gray-50 md:hover:scale-[1.01]'}`}
-                    >
-                      <span className={`font-semibold text-lg md:text-xl ${isSelected ? 'text-primary-dark' : 'text-gray-600 group-hover:text-text-dark'}`}>
-                        {opt.label}
-                      </span>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
-                        ${isSelected ? 'border-primary-dark bg-primary-dark' : 'border-gray-300 group-hover:border-primary-dark'}
-                        ${currentStep.type === "multiple" ? 'rounded-md' : 'rounded-full'}`}
+                  {currentStep.options.map((opt) => {
+                    const isSelected = 
+                      currentStep.type === "multiple" ? (answers[currentStep.id] as string[])?.includes(opt.value) : answers[currentStep.id] === opt.value;
+                    
+                    return (
+                      <button
+                        key={opt.value}
+                        onClick={() => handleSelect(opt.value)}
+                        className={`w-full p-4 md:p-5 text-left rounded-2xl md:rounded-[2rem] border-2 transition-all duration-200 flex items-center justify-between group
+                          ${isSelected ? 'border-primary-dark bg-primary/10 shadow-sm md:scale-[1.02]' : 'border-gray-100 bg-white hover:border-primary-dark hover:bg-gray-50 md:hover:scale-[1.01]'}`}
                       >
-                        {isSelected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-                      </div>
-                    </button>
-                  );
-                })}
+                        <span className={`font-semibold text-lg md:text-xl ${isSelected ? 'text-primary-dark' : 'text-gray-600 group-hover:text-text-dark'}`}>
+                          {opt.label}
+                        </span>
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
+                          ${isSelected ? 'border-primary-dark bg-primary-dark' : 'border-gray-300 group-hover:border-primary-dark'}
+                          ${currentStep.type === "multiple" ? 'rounded-md' : 'rounded-full'}`}
+                        >
+                          {isSelected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+                        </div>
+                      </button>
+                    );
+                  })}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -195,11 +204,11 @@ export default function Questionnaire() {
           <Button 
             variant="primary" 
             onClick={handleNext} 
-            disabled={!canProceed}
+            disabled={!canProceed || loading}
             className="px-8 shadow-md hover:shadow-lg transition-all h-[3.2rem] md:h-14 md:text-lg md:px-10 ml-auto"
           >
-            {currentStepIndex === STEPS.length - 1 ? "Terminer" : "Suivant"}
-            {currentStepIndex === STEPS.length - 1 ? <Check className="w-5 h-5 ml-2" /> : <ChevronRight className="w-5 h-5 ml-2" />}
+            {loading ? "Envoi..." : (currentStepIndex === STEPS.length - 1 ? "Terminer" : "Suivant")}
+            {!loading && (currentStepIndex === STEPS.length - 1 ? <Check className="w-5 h-5 ml-2" /> : <ChevronRight className="w-5 h-5 ml-2" />)}
           </Button>
         </div>
       </div>
