@@ -5,28 +5,32 @@ import dns from 'dns';
 dns.setDefaultResultOrder('ipv4first');
 
 // Configuration du transporteur avec variables d'environnement
-const smtpPort = parseInt(process.env.SMTP_PORT || '587');
+// Si aucun port n'est spécifié, on utilise 465 (plus fiable sur Railway)
+const smtpPort = parseInt(process.env.SMTP_PORT || '465');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: smtpPort,
-  secure: smtpPort === 465,
+  secure: smtpPort === 465, // True pour 465, False pour 587
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
   tls: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: false, // Évite les erreurs de certificat
+    minVersion: 'TLSv1.2'
   },
-  // FONCTION CRITIQUE : Force la résolution DNS à ne retourner que de l'IPv4
+  // Force l'IPv4 et log l'adresse IP pour le debug
   lookup: (hostname: string, options: any, callback: any) => {
-    dns.lookup(hostname, { family: 4 }, callback);
+    dns.lookup(hostname, { family: 4 }, (err, address, family) => {
+      if (!err) console.log(`🔍 Connexion SMTP via IPv${family} : ${address}`);
+      callback(err, address, family);
+    });
   },
-  connectionTimeout: 10000, 
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
+  connectionTimeout: 15000, // Augmenté à 15s pour Railway
+  greetingTimeout: 15000,
+  socketTimeout: 20000,
 } as any);
-
 // Vérifier la configuration du transporteur de manière asynchrone sans bloquer le démarrage
 (async () => {
   try {
