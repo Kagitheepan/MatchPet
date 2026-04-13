@@ -15,9 +15,26 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
+  tls: {
+    rejectUnauthorized: false, // Évite les erreurs de certificat SSL sur certains serveurs
+  },
+  connectionTimeout: 10000, 
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
+// Vérifier la configuration du transporteur de manière asynchrone sans bloquer le démarrage
+(async () => {
+  try {
+    await transporter.verify();
+    console.log('✅ Serveur de messagerie prêt à envoyer des messages');
+  } catch (error) {
+    console.error('❌ Erreur configuration SMTP:', error);
+  }
+})();
+
 export async function sendVerificationEmail(to: string, refugeName: string, code: string) {
+  console.log(`📧 Tentative d'envoi d'email à ${to}...`);
   const mailOptions = {
     from: `"MatchPet" <${process.env.SMTP_USER || 'noreply@matchpet.fr'}>`,
     to,
