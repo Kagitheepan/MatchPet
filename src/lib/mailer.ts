@@ -1,13 +1,16 @@
 import nodemailer from 'nodemailer';
+import dns from 'dns';
 
-// Configure transporter – uses environment variables
-// Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS in .env
-const smtpPort = parseInt(process.env.SMTP_PORT || '465');
+// Force Node.js à utiliser l'IPv4 en priorité pour éviter l'erreur ENETUNREACH (IPv6) sur Railway
+dns.setDefaultResultOrder('ipv4first');
+
+// Configuration du transporteur avec variables d'environnement
+const smtpPort = parseInt(process.env.SMTP_PORT || '587');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: smtpPort,
-  secure: smtpPort === 465,
+  secure: smtpPort === 465, // Doit être false pour le port 587
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
