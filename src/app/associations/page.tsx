@@ -73,6 +73,7 @@ export default function AssociationsPage() {
   const [animalSize, setAnimalSize] = useState("Medium");
   const [animalDescription, setAnimalDescription] = useState("");
   const [animalPhotoUrl, setAnimalPhotoUrl] = useState("");
+  const [animalPhotos, setAnimalPhotos] = useState<string[]>([]);
   const [goodWithChildren, setGoodWithChildren] = useState(false);
   const [goodWithDogs, setGoodWithDogs] = useState(false);
   const [goodWithCats, setGoodWithCats] = useState(false);
@@ -185,20 +186,24 @@ export default function AssociationsPage() {
     setSubmitting(true);
     setSuccessMsg("");
     try {
-      const photos = animalPhotoUrl.trim() ? [animalPhotoUrl.trim()] : null;
+      // Combiner l'URL manuelle et les photos téléchargées
+      const photos = [...animalPhotos];
+      if (animalPhotoUrl.trim()) photos.push(animalPhotoUrl.trim());
+
       const res = await fetch("/api/admin/animals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           refugeId: refuge.id, name: animalName, species: animalSpecies, breed: animalBreed || null,
           age: animalAge, gender: animalGender, size: animalSize, description: animalDescription || null,
-          photos, goodWithChildren, goodWithDogs, goodWithCats, needsGarden, energyLevel: animalEnergy,
+          photos: photos.length > 0 ? photos : null, goodWithChildren, goodWithDogs, goodWithCats, needsGarden, energyLevel: animalEnergy,
         }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setSuccessMsg(`${animalName} a été ajouté avec succès !`);
       setAnimalName(""); setAnimalBreed(""); setAnimalDescription(""); setAnimalPhotoUrl("");
+      setAnimalPhotos([]);
       setGoodWithChildren(false); setGoodWithDogs(false); setGoodWithCats(false); setNeedsGarden(false);
       fetchAnimals();
     } catch (err: any) {
@@ -206,6 +211,23 @@ export default function AssociationsPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAnimalPhotos(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removePhoto = (index: number) => {
+    setAnimalPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
   // ── Update adoption status ──
@@ -297,7 +319,7 @@ export default function AssociationsPage() {
           </div>
         ) : (
           <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-lg border border-gray-100 flex flex-col max-w-lg w-full">
-            <h2 className="text-3xl font-cursive font-bold text-text-dark mb-8 text-center tracking-wide">
+            <h2 className="text-3xl font-cursive text-bold text-text-dark mb-8 text-center tracking-wide">
               {isLoginMode ? "Connexion Association" : "Inscrire votre refuge"}
             </h2>
             {successMsg && <p className="text-green-600 font-medium text-sm text-center mb-4 bg-green-50 p-3 rounded-xl">{successMsg}</p>}
@@ -386,8 +408,6 @@ export default function AssociationsPage() {
           ))}
         </div>
 
-        {/* ── Tab: Mes Animaux ── */}
-...
         {/* ── Tab: Messages (Conversations) ── */}
         {activeTab === "messages" && (
           <div className="max-w-2xl mx-auto w-full">
@@ -438,7 +458,7 @@ export default function AssociationsPage() {
           </div>
         )}
 
-        {/* ── Tab: Dossiers d'adoption ── */}
+        {/* ── Tab: Mes Animaux ── */}
         {activeTab === "animals" && (
           <div>
             {animals.length === 0 ? (
@@ -517,8 +537,49 @@ export default function AssociationsPage() {
                 <textarea value={animalDescription} onChange={e => setAnimalDescription(e.target.value)} placeholder="Description de l'animal..."
                   rows={3} className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all resize-none text-sm md:text-base" />
 
-                <input value={animalPhotoUrl} onChange={e => setAnimalPhotoUrl(e.target.value)} placeholder="URL de la photo"
-                  className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all text-sm md:text-base" />
+                <div className="space-y-3">
+                  <p className="font-bold text-text-dark text-xs md:text-sm uppercase tracking-wide">Photos de l'animal</p>
+                  
+                  {/* Preview des photos */}
+                  {animalPhotos.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {animalPhotos.map((photo, index) => (
+                        <div key={index} className="relative w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden border border-gray-200 group">
+                          <img src={photo} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            type="button" 
+                            onClick={() => removePhoto(index)}
+                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="relative">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple 
+                        onChange={handleFileChange}
+                        className="hidden" 
+                        id="photo-upload" 
+                      />
+                      <label 
+                        htmlFor="photo-upload"
+                        className="flex items-center justify-center gap-2 w-full p-3 md:p-4 rounded-xl border-2 border-dashed border-gray-200 bg-white hover:border-primary-dark hover:bg-gray-50 cursor-pointer transition-all text-sm font-medium text-gray-500"
+                      >
+                        <PlusCircle className="w-5 h-5" />
+                        Ajouter depuis PC
+                      </label>
+                    </div>
+                    <input value={animalPhotoUrl} onChange={e => setAnimalPhotoUrl(e.target.value)} placeholder="Ou URL d'image"
+                      className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all text-sm md:text-base" />
+                  </div>
+                </div>
 
                 {/* Critères de matching */}
                 <div className="bg-white rounded-2xl p-4 md:p-5 border border-gray-100">
