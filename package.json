@@ -2,7 +2,7 @@
   "name": "matchpet",
   "version": "0.1.0",
   "private": true,
-"scripts": {
+  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "prisma migrate deploy && next start -H 0.0.0.0 -p ${PORT:-3000}",
@@ -15,6 +15,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@types/three": "^0.183.1",
+    "all": "^0.0.0",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
