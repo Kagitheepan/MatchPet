@@ -4,6 +4,8 @@ import { Heart } from "lucide-react";
 import DesktopScene from "@/components/3d/DesktopScene";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   // Récupérer un pool d'animaux récents
   const recentAnimals = await prisma.animal.findMany({
