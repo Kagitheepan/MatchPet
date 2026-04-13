@@ -21,30 +21,34 @@ async function getSmtpHost() {
   }
 }
 
-const smtpPort = parseInt(process.env.SMTP_PORT || '465');
+const smtpPort = parseInt(process.env.SMTP_PORT || '587');
 
 // On crée une fonction pour obtenir le transporteur car on a besoin d'attendre la résolution IP
 async function createTransporter() {
   const hostIp = await getSmtpHost();
+  const hostName = process.env.SMTP_HOST || 'smtp.gmail.com';
+
+  console.log(`🚀 Tentative de connexion SMTP : ${hostIp}:${smtpPort} (Host: ${hostName}, Secure: ${smtpPort === 465})`);
 
   return nodemailer.createTransport({
     host: hostIp,
     port: smtpPort,
-    secure: smtpPort === 465,
+    secure: smtpPort === 465, // False pour 587
     auth: {
       user: process.env.SMTP_USER || '',
       pass: process.env.SMTP_PASS || '',
     },
     tls: {
       rejectUnauthorized: false,
-      servername: process.env.SMTP_HOST || 'smtp.gmail.com' // CRITIQUE : Garder le nom d'hôte pour le certificat SSL
+      servername: hostName
     },
+    // Options pour le port 587
+    requireTLS: smtpPort === 587,
     connectionTimeout: 15000,
     greetingTimeout: 15000,
     socketTimeout: 20000,
   } as any);
 }
-
 let transporterPromise = createTransporter();
 
 // Vérification silencieuse au démarrage
