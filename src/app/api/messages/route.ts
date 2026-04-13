@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// GET: RÃ©cupÃ©rer les messages d'un dossier d'adoption
+// GET: Récupérer les messages d'un dossier d'adoption
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const adoptionId = searchParams.get('adoptionId');
@@ -20,6 +20,7 @@ export async function GET(request: Request) {
     // Marquer comme lu
     const { searchParams: params } = new URL(request.url);
     const viewerType = params.get('viewerType'); // 'user' ou 'refuge'
+    
     if (viewerType === 'user') {
       await prisma.adoption.update({
         where: { id: parseInt(adoptionId) },
@@ -51,26 +52,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Tous les champs sont requis' }, { status: 400 });
     }
 
+    // Le frontend envoie 'refuge' ou 'user' en minuscules, on valide d'abord
     if (!['refuge', 'user'].includes(senderType)) {
       return NextResponse.json({ error: 'senderType invalide' }, { status: 400 });
     }
 
-    // VÃ©rifier que l'adoption existe
+    // Vérifier que l'adoption existe
     const adoption = await prisma.adoption.findUnique({ where: { id: aid } });
     if (!adoption) {
       return NextResponse.json({ error: 'Dossier introuvable' }, { status: 404 });
     }
 
+    // Création du message avec conversion en MAJUSCULE pour correspondre à l'Enum Prisma
     const message = await prisma.message.create({
       data: {
         adoptionId: aid,
-        senderType,
+        senderType: senderType.toUpperCase(), // <-- La correction est ici
         senderId: sid,
         content: content.trim(),
       },
     });
 
-    // Mettre Ã  jour les drapeaux de lecture dans l'adoption
+    // Mettre à jour les drapeaux de lecture dans l'adoption
     await prisma.adoption.update({
       where: { id: aid },
       data: {
