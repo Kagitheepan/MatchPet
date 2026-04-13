@@ -22,10 +22,11 @@ export default function SearchPage() {
         const mappedData = data.map((animal: any) => {
           let type = "autre";
           const speciesLower = animal.species?.toLowerCase() || '';
-          if (speciesLower.includes("dog")) type = "chien";
-          else if (speciesLower.includes("cat")) type = "chat";
-          else if (speciesLower.includes("bird")) type = "oiseau";
-          else if (speciesLower.includes("rabbit") || speciesLower.includes("small")) type = "lapin";
+          
+          if (speciesLower.includes("dog") || speciesLower.includes("chien")) type = "chien";
+          else if (speciesLower.includes("cat") || speciesLower.includes("chat")) type = "chat";
+          else if (speciesLower.includes("bird") || speciesLower.includes("oiseau")) type = "oiseau";
+          else if (speciesLower.includes("rabbit") || speciesLower.includes("lapin") || speciesLower.includes("small")) type = "lapin";
 
           return {
             id: animal.id.toString(),

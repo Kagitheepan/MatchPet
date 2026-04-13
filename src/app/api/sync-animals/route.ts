@@ -1,7 +1,16 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { fetchAnimalsFromRescueGroups } from '@/lib/rescuegroups';
+
+function normalizeSpecies(raw: string): string {
+  const s = raw.toLowerCase();
+  if (s.includes('dog') || s.includes('chien')) return 'Dog';
+  if (s.includes('cat') || s.includes('chat')) return 'Cat';
+  if (s.includes('bird') || s.includes('oiseau')) return 'Bird';
+  if (s.includes('rabbit') || s.includes('lapin')) return 'Rabbit';
+  return 'Other';
+}
 
 export async function POST(request: Request) {
   try {
@@ -33,8 +42,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'No animals found to sync' }, { status: 404 });
     }
 
-    // On s'assure qu'un refuge par dÃ©faut existe pour les tests (ou on crÃ©e dynamiquement)
-    // Pour cet exemple, on utilise le refuge de test ID 1 crÃ©Ã© par le seed.
+    // On s'assure qu'un refuge par dÃ©faut existe pour les tests
     let defaultRefuge = await prisma.refuge.findFirst();
     
     if (!defaultRefuge) {
@@ -54,12 +62,14 @@ export async function POST(request: Request) {
     const syncResults = [];
 
     for (const ext of externalAnimals) {
+      const species = normalizeSpecies(ext.attributes.speciesString || ext.attributes.type || 'Unknown');
+      
       const animal = await prisma.animal.upsert({
         where: { externalId: ext.id },
         update: {
           name: ext.attributes.name,
           description: ext.attributes.descriptionText || '',
-          species: ext.attributes.speciesString || ext.attributes.type || 'Unknown',
+          species: species,
           breed: ext.attributes.breedPrimary || 'Unknown',
           age: ext.attributes.ageGroup || 'Unknown',
           gender: ext.attributes.sex || 'Unknown',
@@ -70,14 +80,13 @@ export async function POST(request: Request) {
           externalId: ext.id,
           name: ext.attributes.name,
           description: ext.attributes.descriptionText || '',
-          species: ext.attributes.speciesString || ext.attributes.type || 'Unknown',
+          species: species,
           breed: ext.attributes.breedPrimary || 'Unknown',
           age: ext.attributes.ageGroup || 'Unknown',
           gender: ext.attributes.sex || 'Unknown',
           size: ext.attributes.sizeGroup || 'Unknown',
           photos: ext.attributes.pictureThumbnailUrl ? [ext.attributes.pictureThumbnailUrl] : [],
           refugeId: defaultRefuge.id,
-          // CritÃ¨res par dÃ©faut (pourront Ãªtre affinÃ©s avec plus de donnÃ©es RescueGroups)
           goodWithChildren: true, 
           goodWithDogs: true,
           goodWithCats: true,

@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
@@ -12,11 +12,12 @@ export async function GET(request: Request) {
   const speciesRaw = searchParams.get('species') || ''
   const ageRaw = searchParams.get('age') || ''
 
-  const speciesMap: Record<string, string> = {
-    dog: 'Dog',
-    cat: 'Cat',
-    rabbit: 'Rabbit',
-    other: 'Other',
+  const speciesMap: Record<string, string[]> = {
+    dog: ['Dog', 'Chien'],
+    cat: ['Cat', 'Chat'],
+    rabbit: ['Rabbit', 'Lapin'],
+    bird: ['Bird', 'Oiseau'],
+    other: ['Other', 'Autre'],
   }
 
   function getAgeFilter(ageStr: string): string[] {
@@ -26,14 +27,16 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Remplacement de `any` par le type exact de Prisma
     const whereClause: Prisma.AnimalWhereInput = {}
 
     if (speciesRaw) {
-      const dbSpecies = speciesRaw
-        .split(',')
-        .map(k => speciesMap[k] || k)
-        .filter(Boolean)
+      const keys = speciesRaw.split(',').filter(Boolean);
+      const dbSpecies: string[] = [];
+      
+      keys.forEach(k => {
+        const matches = speciesMap[k.toLowerCase()] || [k];
+        dbSpecies.push(...matches);
+      });
       
       if (dbSpecies.length > 0) {
         whereClause.species = { in: dbSpecies }
@@ -50,7 +53,6 @@ export async function GET(request: Request) {
     }
 
     if (hasOtherPets) {
-      // Ã€ rÃ©viser selon votre schÃ©ma de base de donnÃ©es (ex: goodWithCats)
       whereClause.goodWithDogs = true
     }
 
@@ -66,13 +68,12 @@ export async function GET(request: Request) {
       orderBy: {
         updatedAt: 'desc'
       },
-      // Ã€ remplacer par des variables dynamiques (skip, take) pour la pagination
       take: 50 
     })
 
     return NextResponse.json(animals)
   } catch (error: any) {
     console.error('Error in matching API:', error)
-    return NextResponse.json({ error: error.message || error.toString(), detail: "DEBUG" }, { status: 500 })
+    return NextResponse.json({ error: error.message || error.toString() }, { status: 500 })
   }
 }
