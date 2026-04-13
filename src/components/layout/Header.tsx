@@ -268,7 +268,7 @@ export default function Header() {
                   <p className="text-gray-400 font-medium">Posez vos questions au refuge ici !</p>
                 </div>
               ) : (
-                chatMessages.map((msg: any) => (
+                messages.map((msg: any) => (
                   <div key={msg.id} className={`flex ${msg.senderType === 'USER' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm font-medium ${
                       msg.senderType === 'USER'
