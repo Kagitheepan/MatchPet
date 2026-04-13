@@ -10,18 +10,20 @@ const smtpPort = parseInt(process.env.SMTP_PORT || '587');
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: smtpPort,
-  secure: smtpPort === 465, // Doit être false pour le port 587
+  secure: smtpPort === 465,
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
   tls: {
-    rejectUnauthorized: false, // Évite les erreurs de certificat SSL sur certains serveurs
+    rejectUnauthorized: false,
   },
+  // @ts-ignore - 'family' est supporté par nodemailer pour forcer l'IPv4 mais peut manquer dans les types
+  family: 4, 
   connectionTimeout: 10000, 
   greetingTimeout: 10000,
   socketTimeout: 10000,
-});
+} as any);
 
 // Vérifier la configuration du transporteur de manière asynchrone sans bloquer le démarrage
 (async () => {
