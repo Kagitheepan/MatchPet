@@ -62,9 +62,6 @@ export async function GET(request: Request) {
 
     const animals = await prisma.animal.findMany({
       where: whereClause,
-      include: {
-        refuge: true
-      },
       select: {
         id: true,
         name: true,
@@ -72,9 +69,8 @@ export async function GET(request: Request) {
         breed: true,
         age: true,
         photos: true,
-        refuge: true,
         updatedAt: true,
-        // On sélectionne uniquement ce qui est utile pour les cartes de match
+        refuge: true, // La relation est incluse ici directement
       },
       orderBy: {
         updatedAt: 'desc'

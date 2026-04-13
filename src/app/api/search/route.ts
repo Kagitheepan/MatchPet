@@ -5,9 +5,6 @@ import { prisma } from '@/lib/prisma'
 export async function GET(request: Request) {
   try {
     const animals = await prisma.animal.findMany({
-      include: {
-        refuge: true
-      },
       select: {
         id: true,
         name: true,
@@ -15,9 +12,8 @@ export async function GET(request: Request) {
         breed: true,
         age: true,
         photos: true,
-        refuge: true,
         updatedAt: true,
-        // On exclut 'description' pour alléger le tri MySQL
+        refuge: true, // Relation incluse dans le select
       },
       orderBy: {
         updatedAt: 'desc'
