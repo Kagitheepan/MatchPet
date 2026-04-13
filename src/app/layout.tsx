@@ -3,6 +3,7 @@ import { Quicksand, Caveat } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import BottomNav from "@/components/layout/BottomNav";
 
 const quicksand = Quicksand({
   variable: "--font-quicksand",
@@ -26,11 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${quicksand.variable} ${caveat.variable} h-full antialiased`}>
-      <body className="min-h-[100dvh] font-sans bg-bg-light flex flex-col w-full text-text-dark overflow-x-hidden">
+      <body className="min-h-[100dvh] font-sans bg-white flex flex-col w-full text-text-dark overflow-x-hidden">
         <Header />
-        <main className="flex-1 flex flex-col w-full relative z-0">
+        <main className="flex-1 flex flex-col w-full relative z-0 pb-16 md:pb-0">
           {children}
         </main>
+        <BottomNav />
         <Footer />
       </body>
     </html>

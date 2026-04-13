@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowLeft, Cat } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
 
 export default function EmptyMatchPage() {
   return (
@@ -15,8 +16,14 @@ export default function EmptyMatchPage() {
       
       <div className="w-full flex justify-center mb-16 relative">
         <div className="absolute inset-x-8 top-12 bottom-0 bg-[#f4a198]/30 rounded-[3rem] -z-10 rotate-6 transform scale-105"></div>
-        <div className="bg-white p-8 rounded-full shadow-sm">
-          <Cat className="w-32 h-32 text-text-dark" strokeWidth={1} />
+        <div className="bg-white p-4">
+          <Image 
+            src="/img_nomatch.png" 
+            alt="Pas de match" 
+            width={256} 
+            height={256}
+            className="object-contain"
+          />
         </div>
       </div>
 

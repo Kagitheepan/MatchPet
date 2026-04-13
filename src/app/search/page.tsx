@@ -60,7 +60,7 @@ export default function SearchPage() {
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-6 md:py-12 flex flex-col md:flex-row gap-8 items-start relative z-10">
       
       {/* Mobile Search & Filters Top Bar */}
-      <div className="md:hidden w-full flex flex-col gap-4 sticky top-0 bg-bg-light/95 backdrop-blur-md pt-2 pb-4 z-20">
+      <div className="md:hidden w-full flex flex-col gap-4 sticky top-0 bg-white/95 backdrop-blur-md pt-2 pb-4 z-20">
         <h1 className="font-cursive text-4xl text-text-dark font-bold">Explorer</h1>
         <div className="relative w-full">
           <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

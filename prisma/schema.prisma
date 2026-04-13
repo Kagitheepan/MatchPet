@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -12,8 +13,10 @@ datasource db {
 model UserProfile {
   id              Int      @id @default(autoincrement())
   email           String   @unique
+  password        String?
+  phone           String?
   name            String?
-  location        String   // Code postal ou Ville
+  location        String?  // Code postal ou Ville
   latitude        Float?
   longitude       Float?
   searchRadius    Int      @default(30) // Rayon en KM
@@ -24,24 +27,57 @@ model UserProfile {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  adoptions       Adoption[]
+
   @@index([latitude, longitude])
 }
 
+model Adoption {
+  id               Int         @id @default(autoincrement())
+  userId           Int
+  user             UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animalExternalId String
+  animalName       String
+  animalImage      String?
+  refugeId         Int?
+  status           String      @default("pending")
+  hasUnreadUser    Boolean     @default(false) // Nouveau message pour l'utilisateur
+  hasUnreadRefuge  Boolean     @default(false) // Nouveau message pour le refuge
+  messages         Message[]
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  adoptionId  Int
+  adoption    Adoption @relation(fields: [adoptionId], references: [id], onDelete: Cascade)
+  senderType  String   // "refuge" ou "user"
+  senderId    Int      // id du refuge ou de l'utilisateur
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([adoptionId])
+}
+
 model Refuge {
-  id              Int      @id @default(autoincrement())
-  name            String
-  description     String?  @db.Text
-  address         String
-  city            String
-  postalCode      String
-  latitude        Float
-  longitude       Float
-  phone           String?
-  email           String?
-  website         String?
-  animals         Animal[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  name              String
+  description       String?  @db.Text
+  address           String
+  city              String
+  postalCode        String
+  latitude          Float
+  longitude         Float
+  phone             String?
+  email_refuge      String   @unique
+  website           String?
+  password          String?
+  verificationCode  String?
+  isVerified        Boolean  @default(false)
+  animals           Animal[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@index([latitude, longitude])
 }
@@ -66,7 +102,7 @@ model Animal {
   energyLevel      String?
 
   refugeId        Int
-  refuge          Refuge   @relation(fields: [refugeId], references: [id])
+  refuge          Refuge   @relation(fields: [refugeId], references: [id], onDelete: Cascade)
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

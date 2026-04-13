@@ -33,22 +33,31 @@ export async function fetchAnimalsFromRescueGroups(zipCode?: string, radius: num
   }
 
   try {
-    const payloadData: any = { limit };
+    const payloadData: any = { 
+      limit,
+    };
+    
+    const filters = [];
+
     if (zipCode) {
-      payloadData.filterRadius = {
-        postalcode: zipCode,
-        miles: radius,
-      };
+      filters.push({
+        fieldName: "animals.postalcode",
+        operation: "radius",
+        criteria: zipCode,
+        radius: radius
+      });
     }
     
     if (species) {
-      payloadData.filters = [
-        {
-          fieldName: "species.singular",
-          operation: "equals",
-          criteria: species,
-        }
-      ];
+      filters.push({
+        fieldName: "species.singular",
+        operation: "equals",
+        criteria: species,
+      });
+    }
+
+    if (filters.length > 0) {
+      payloadData.filters = filters;
     }
 
     const response = await fetch(`${API_BASE_URL}/animals/search/available/`, {
@@ -59,7 +68,8 @@ export async function fetchAnimalsFromRescueGroups(zipCode?: string, radius: num
       },
       body: JSON.stringify({
         data: payloadData,
-        include: ['species']
+        // Request species inclusion to get the species name
+        include: 'species'
       }),
     });
 

@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, MapPin, Heart } from "lucide-react";
+import { X, Check, MapPin, Heart, Cat } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import DesktopScene from "@/components/3d/DesktopScene";
 
 export default function MatchPage() {
   const router = useRouter();
@@ -14,8 +13,7 @@ export default function MatchPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // States for Liked Matches
-  const [showLikes, setShowLikes] = useState(false);
+  const [isUserConnected, setIsUserConnected] = useState(false);
   const [likedAnimals, setLikedAnimals] = useState<any[]>([]);
 
   useEffect(() => {
@@ -23,10 +21,15 @@ export default function MatchPage() {
     const savedLikes = JSON.parse(localStorage.getItem('liked_animals') || '[]');
     setLikedAnimals(savedLikes);
 
+    const loggedUser = JSON.parse(localStorage.getItem('current_user') || 'null');
+    setIsUserConnected(!!loggedUser);
+
     const fetchMatches = async () => {
       let hasChildren = false;
       let hasOtherPets = false;
       let hasGarden = false;
+      let desiredSpecies: string[] = [];
+      let desiredAge: string[] = [];
 
       const answersStr = localStorage.getItem("matchpet_answers");
       if (answersStr) {
@@ -35,11 +38,19 @@ export default function MatchPage() {
           hasChildren = parsed.hasChildren !== "no" && parsed.hasChildren !== undefined;
           hasOtherPets = parsed.hasAnimals !== "no" && parsed.hasAnimals !== undefined;
           hasGarden = parsed.hasGarden === "yes";
+          if (Array.isArray(parsed.desiredAnimal)) {
+            desiredSpecies = parsed.desiredAnimal;
+          }
+          if (Array.isArray(parsed.desiredAge)) {
+            desiredAge = parsed.desiredAge;
+          }
         } catch (e) {}
       }
 
       try {
-        const response = await fetch(`/api/match?hasChildren=${hasChildren}&hasOtherPets=${hasOtherPets}&hasGarden=${hasGarden}`);
+        const speciesParam = desiredSpecies.length > 0 ? `&species=${desiredSpecies.join(',')}` : '';
+        const ageParam = desiredAge.length > 0 ? `&age=${desiredAge.join(',')}` : '';
+        const response = await fetch(`/api/match?hasChildren=${hasChildren}&hasOtherPets=${hasOtherPets}&hasGarden=${hasGarden}${speciesParam}${ageParam}`);
         if (!response.ok) throw new Error("Erreur lors de la récupération des matchs");
         
         const data = await response.json();
@@ -65,6 +76,7 @@ export default function MatchPage() {
       }
     };
 
+    // Toujours récupérer les matchs
     fetchMatches();
   }, [router]);
 
@@ -92,34 +104,36 @@ export default function MatchPage() {
 
   const currentProfile = animals[currentIndex];
 
-  const speciesLabel = currentProfile?.species?.toLowerCase() || '';
-  let modelName: "rabbit" | "dog" | "cat" | "all" = "rabbit";
-  if (speciesLabel.includes("dog")) modelName = "dog";
-  else if (speciesLabel.includes("cat")) modelName = "cat";
+
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center bg-gray-50 md:bg-[#f6f7f5] relative overflow-hidden md:justify-center py-0 md:py-12 px-0 md:px-8">
-      <div className="hidden lg:block absolute inset-0 pointer-events-none opacity-40">
-        <DesktopScene model={modelName} />
-      </div>
+    <div className="w-full flex-1 flex flex-col items-center justify-center bg-white relative overflow-hidden py-4 md:py-8 px-4 md:px-8">
 
-      <div className="w-full h-full max-w-[440px] md:max-w-md flex flex-col relative z-10 md:bg-white md:rounded-[3rem] md:shadow-[0_20px_60px_rgba(0,0,0,0.06)] md:border md:border-gray-50 md:h-[800px] md:max-h-[85vh] overflow-hidden">
-        
-        {/* Header text */}
-        <div className="w-full px-6 pt-6 md:pt-8 pb-2 relative z-10 flex justify-between items-end">
-          <div>
-            <h1 className="font-cursive text-[2.5rem] md:text-5xl font-bold text-text-dark leading-none">Votre Match</h1>
-            <p className="text-gray-500 font-medium text-sm md:text-base mt-1">Compatibilité à 95%</p>
-          </div>
-          <button 
-            onClick={() => setShowLikes(true)}
-            className="flex items-center justify-center p-3 rounded-full bg-red-50 text-red-500 hover:bg-red-100 transition-colors shadow-sm"
-          >
-            <Heart className="w-6 h-6" fill="currentColor" />
-          </button>
+      {(!loading && !error && (animals.length === 0 || !currentProfile)) ? (
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 h-full w-full max-w-sm mt-auto mb-auto">
+          <Image 
+            src="/img_nomatch.png" 
+            alt="Pas de match" 
+            width={400}
+            height={400}
+            priority
+            className="object-contain mix-blend-darken mb-6" 
+          />
+          <h2 className="font-cursive text-4xl font-bold text-text-dark mb-4">Pas de matchs</h2>
+          <p className="text-gray-500 font-medium leading-relaxed">
+            {animals.length === 0 
+              ? "Désolé, aucun animal ne correspond à vos critères pour le moment."
+              : "Vous avez vu tous les profils ! Revenez plus tard."}
+          </p>
         </div>
+      ) : (
+      <div className="w-full max-w-[400px] flex flex-col items-center relative z-10">
+        
+        {/* Title */}
+        <h1 className="font-cursive text-4xl md:text-5xl font-bold text-[#E2725B] mb-4 self-center pl-2">Vos Match</h1>
 
-        <div className="flex-1 w-full relative flex items-center justify-center mt-4 mb-4 md:px-6">
+        {/* Card */}
+        <div className="w-full relative">
           <AnimatePresence mode="popLayout">
             {loading ? (
                <div className="flex flex-col items-center justify-center p-12">
@@ -130,10 +144,6 @@ export default function MatchPage() {
                <div className="text-center p-8">
                  <p className="text-red-500 font-semibold mb-4">{error}</p>
                  <button onClick={() => window.location.reload()} className="text-primary-dark font-bold underline">Réessayer</button>
-               </div>
-            ) : animals.length === 0 || !currentProfile ? (
-               <div className="text-center p-8">
-                 <p className="text-gray-500 font-medium">Désolé, aucun animal ne correspond à votre profil pour le moment.</p>
                </div>
             ) : (
               animals.slice(currentIndex, currentIndex + 1).map((profile) => (
@@ -146,92 +156,50 @@ export default function MatchPage() {
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.95, opacity: 0, x: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="absolute w-[calc(100%-2.5rem)] md:w-full h-[calc(100%-1rem)] bg-white rounded-[2rem] shadow-[0_4px_25px_rgba(0,0,0,0.05)] overflow-hidden cursor-grab active:cursor-grabbing border border-gray-100"
+                className="w-full bg-white rounded-[2rem] shadow-[0_4px_25px_rgba(0,0,0,0.08)] overflow-hidden cursor-grab active:cursor-grabbing border border-gray-100"
               >
-                <div className="relative w-full h-[65%] md:h-[60%] overflow-hidden">
+                <div className="relative w-full h-[350px] md:h-[400px] overflow-hidden rounded-t-[2rem]">
                   <Image 
                     src={profile.image} 
                     alt={profile.name} 
                     fill 
-                    sizes="(max-width: 768px) 100vw, 440px"
+                    sizes="(max-width: 768px) 100vw, 400px"
                     className="object-cover"
                     priority
                   />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center shadow-sm">
-                    <MapPin className="w-3.5 h-3.5 text-primary-dark mr-1" />
-                    <span className="text-[12px] font-bold text-text-dark">{profile.distance}</span>
-                  </div>
                 </div>
 
-                <div className="p-6 h-[40%] flex flex-col bg-white">
-                  <div className="flex justify-between items-start mb-2">
-                    <h2 className="font-cursive text-4xl text-text-dark font-bold leading-none">{profile.name}</h2>
-                  </div>
-                  <p className="text-gray-500 text-sm font-medium leading-relaxed line-clamp-2 md:line-clamp-3 mt-auto">
+                <div className="px-7 py-5 flex flex-col bg-white">
+                  <h2 className="font-cursive text-4xl text-text-dark font-bold mb-1">{profile.name}</h2>
+                  <p className="text-gray-500 text-[15px] font-medium leading-relaxed mb-2 line-clamp-1">
                     {profile.description}
                   </p>
+                  <div className="flex items-center gap-2 text-gray-400 mb-5">
+                    <MapPin className="w-5 h-5" strokeWidth={2} />
+                    <span className="text-[15px] font-medium">{profile.location}</span>
+                  </div>
+                  {/* Action Buttons */}
+                  <div className="flex justify-between items-center">
+                    <button 
+                      onClick={() => handleSwipe("left")}
+                      className="w-14 h-14 rounded-full bg-[#E2725B] shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+                    >
+                      <X className="w-7 h-7 text-white" strokeWidth={3} />
+                    </button>
+                    <button 
+                      onClick={() => handleSwipe("right")}
+                      className="w-14 h-14 rounded-full bg-[#bad2b6] shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+                    >
+                      <Check className="w-7 h-7 text-white" strokeWidth={3} />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
-            )))}
-          </AnimatePresence>
+            )))}</AnimatePresence>
         </div>
-
-        {/* Actions Bottom */}
-        <div className="w-full px-8 pb-8 md:pb-10 pt-2 flex justify-center gap-6 relative z-10 md:px-12">
-          <button 
-            onClick={() => handleSwipe("left")}
-            className="w-16 h-16 md:w-18 md:h-18 rounded-full bg-white shadow-[0_5px_20px_rgba(0,0,0,0.05)] hover:shadow-md hover:bg-red-50 hover:scale-105 border border-gray-100 flex items-center justify-center transition-all group"
-          >
-            <X className="w-8 h-8 md:w-9 md:h-9 text-gray-400 group-hover:text-red-400 transition-colors" strokeWidth={2.5} />
-          </button>
-          
-          <button 
-            onClick={() => handleSwipe("right")}
-            className="w-16 h-16 md:w-18 md:h-18 rounded-full bg-primary shadow-[0_5px_20px_rgba(210,228,200,0.4)] hover:shadow-lg hover:bg-primary-dark hover:scale-105 flex items-center justify-center transition-all group"
-          >
-            <Check className="w-8 h-8 md:w-9 md:h-9 text-primary-dark group-hover:text-white transition-colors" strokeWidth={3} />
-          </button>
-        </div>
-
-        {/* Liked List Overlay */}
-        <AnimatePresence>
-          {showLikes && (
-            <motion.div 
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white z-50 flex flex-col items-center"
-            >
-              <div className="w-full p-6 flex justify-between items-center shadow-sm border-b border-gray-100">
-                <h2 className="font-cursive text-3xl font-bold text-text-dark">Mes Coups de Coeur</h2>
-                <button onClick={() => setShowLikes(false)} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                  <X className="w-7 h-7 text-gray-500" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto w-full p-4 space-y-4 bg-gray-50">
-                {likedAnimals.length === 0 ? (
-                  <p className="text-gray-500 text-center mt-10">Vous n'avez pas encore liké d'animaux.</p>
-                ) : (
-                  likedAnimals.map(animal => (
-                    <div key={animal.id} className="flex gap-4 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 items-center">
-                      <div className="relative w-24 h-24 rounded-xl overflow-hidden shrink-0">
-                        <Image src={animal.image} alt={animal.name} fill sizes="96px" className="object-cover" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-xl text-text-dark">{animal.name}</h3>
-                        <p className="text-gray-500 text-sm font-medium">{animal.location}</p>
-                        <button className="mt-2 text-sm text-primary-dark font-bold underline">Contacter le refuge</button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
       </div>
+      )}
     </div>
   );
 }

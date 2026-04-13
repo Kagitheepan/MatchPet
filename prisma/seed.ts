@@ -30,7 +30,7 @@ async function main() {
       postalCode: '75001',
       latitude: 48.8566,
       longitude: 2.3522,
-      email: 'contact@refuge.fr'
+      email_refuge: 'contact@refuge.fr'
     }
   })
 

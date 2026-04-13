@@ -25,7 +25,6 @@ export default function Footer() {
           <h3 className="font-cursive text-2xl text-[#f4c4c4] mb-3 md:mb-5">Explorer</h3>
           <Link href="/search" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Les Annonces</Link>
           <Link href="/match" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Le Matching</Link>
-          <Link href="/favorites" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Nos Articles</Link>
         </div>
 
         {/* Legal */}
