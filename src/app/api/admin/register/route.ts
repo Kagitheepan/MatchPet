@@ -41,10 +41,14 @@ export async function POST(request: Request) {
     });
 
     // Envoyer l'email de vÃ©rification
+// Envoyer l'email de vérification
     try {
       await sendVerificationEmail(email, name, verificationCode);
     } catch (emailErr) {
       console.error('Erreur envoi email:', emailErr);
+      // On supprime le refuge créé pour qu'il puisse retenter son inscription
+      await prisma.refuge.delete({ where: { id: refuge.id } });
+      return NextResponse.json({ error: "Le compte n'a pas pu être créé car l'envoi de l'email a échoué." }, { status: 500 });
     }
 
     return NextResponse.json({
