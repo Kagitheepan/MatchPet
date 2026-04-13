@@ -65,6 +65,17 @@ export async function GET(request: Request) {
       include: {
         refuge: true
       },
+      select: {
+        id: true,
+        name: true,
+        species: true,
+        breed: true,
+        age: true,
+        photos: true,
+        refuge: true,
+        updatedAt: true,
+        // On sélectionne uniquement ce qui est utile pour les cartes de match
+      },
       orderBy: {
         updatedAt: 'desc'
       },

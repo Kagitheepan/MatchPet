@@ -8,10 +8,21 @@ export async function GET(request: Request) {
       include: {
         refuge: true
       },
+      select: {
+        id: true,
+        name: true,
+        species: true,
+        breed: true,
+        age: true,
+        photos: true,
+        refuge: true,
+        updatedAt: true,
+        // On exclut 'description' pour alléger le tri MySQL
+      },
       orderBy: {
         updatedAt: 'desc'
       },
-      take: 100
+      take: 50
     })
 
     return NextResponse.json(animals)

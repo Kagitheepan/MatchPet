@@ -60,7 +60,21 @@ export async function GET(request: Request) {
   try {
     const animals = await prisma.animal.findMany({
       where: { refugeId: parseInt(refugeId) },
+      take: 50,
       orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        species: true,
+        breed: true,
+        age: true,
+        gender: true,
+        size: true,
+        photos: true,
+        refugeId: true,
+        createdAt: true,
+        // On exclut 'description' qui est un champ TEXT lourd
+      }
     });
     return NextResponse.json(animals);
   } catch (error) {
