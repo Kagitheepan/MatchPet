@@ -2,8 +2,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import { sendVerificationEmail } from '@/lib/mailer';
 
 export async function POST(request: Request) {
   try {
@@ -19,11 +17,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Un refuge avec cet email existe dÃ©jÃ ' }, { status: 409 });
     }
 
-    // GÃ©nÃ©rer un code de vÃ©rification Ã  6 chiffres
-    const verificationCode = crypto.randomInt(100000, 999999).toString();
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // CrÃ©er le refuge en base
+    // CrÃ©er le refuge en base - Directement vÃ©rifiÃ©
     const refuge = await prisma.refuge.create({
       data: {
         name,
@@ -35,25 +31,14 @@ export async function POST(request: Request) {
         latitude: 0,
         longitude: 0,
         password: hashedPassword,
-        verificationCode,
-        isVerified: false,
+        verificationCode: null,
+        isVerified: true,
       },
     });
 
-    // Envoyer l'email de vÃ©rification
-// Envoyer l'email de vérification
-    try {
-      await sendVerificationEmail(email, name, verificationCode);
-    } catch (emailErr) {
-      console.error('Erreur envoi email:', emailErr);
-      // On supprime le refuge créé pour qu'il puisse retenter son inscription
-      await prisma.refuge.delete({ where: { id: refuge.id } });
-      return NextResponse.json({ error: "Le compte n'a pas pu être créé car l'envoi de l'email a échoué." }, { status: 500 });
-    }
-
     return NextResponse.json({
       success: true,
-      message: 'Inscription rÃ©ussie. Un code de vÃ©rification a Ã©tÃ© envoyÃ© Ã  votre email.',
+      message: 'Inscription rÃ©ussie.',
       refugeId: refuge.id,
     });
   } catch (error) {

@@ -35,7 +35,6 @@ export default function AssociationsPage() {
   // Auth
   const [showAuth, setShowAuth] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [showVerify, setShowVerify] = useState(false);
   const [authError, setAuthError] = useState("");
 
   // Register fields
@@ -50,10 +49,6 @@ export default function AssociationsPage() {
   // Login fields
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-
-  // Verify
-  const [verifyEmail, setVerifyEmail] = useState("");
-  const [verifyCode, setVerifyCode] = useState("");
 
   // Dashboard
   const [activeTab, setActiveTab] = useState<TabType>("animals");
@@ -146,32 +141,11 @@ export default function AssociationsPage() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      setVerifyEmail(regEmail);
-      setShowVerify(true);
-      setShowAuth(false);
-    } catch (err: any) {
-      setAuthError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError("");
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/admin/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: verifyEmail, code: verifyCode }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setShowVerify(false);
+      
       setIsLoginMode(true);
-      setShowAuth(true);
-      setSuccessMsg("Compte vérifié ! Connectez-vous.");
+      setSuccessMsg("Inscription réussie ! Vous pouvez maintenant vous connecter.");
+      // Reset register fields
+      setRegName(""); setRegEmail(""); setRegPassword(""); setRegPhone(""); setRegAddress(""); setRegCity(""); setRegPostalCode("");
     } catch (err: any) {
       setAuthError(err.message);
     } finally {
@@ -302,28 +276,6 @@ export default function AssociationsPage() {
     return (
       <div className="w-full flex-1 flex items-center justify-center bg-white min-h-[calc(100vh-80px)]">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  // ── Verify screen ──
-  if (showVerify) {
-    return (
-      <div className="w-full flex-1 flex flex-col items-center justify-center bg-white p-6 min-h-[calc(100vh-80px)]">
-        <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-lg border border-gray-100 max-w-md w-full">
-          <h2 className="text-3xl font-cursive font-bold text-text-dark mb-4 text-center">Vérification</h2>
-          <p className="text-gray-500 font-medium text-center mb-8 leading-relaxed">
-            Un code à 6 chiffres a été envoyé à <strong>{verifyEmail}</strong>. Saisissez-le ci-dessous.
-          </p>
-          <form onSubmit={handleVerify} className="flex flex-col gap-5">
-            <input value={verifyCode} onChange={e => setVerifyCode(e.target.value)} placeholder="Code à 6 chiffres" required maxLength={6}
-              className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary-dark outline-none font-bold text-center text-2xl tracking-[0.5em] transition-all" />
-            {authError && <p className="text-red-500 font-medium text-sm text-center">{authError}</p>}
-            <Button type="submit" variant="primary" className="w-full h-14 text-lg font-bold shadow-md hover:scale-[1.02] transition-transform" disabled={submitting}>
-              {submitting ? "..." : "Vérifier"}
-            </Button>
-          </form>
-        </div>
       </div>
     );
   }
