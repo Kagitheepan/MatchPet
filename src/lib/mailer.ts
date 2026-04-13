@@ -1,41 +1,58 @@
 import nodemailer from 'nodemailer';
 import dns from 'dns';
+import { promisify } from 'util';
 
-// Force Node.js à utiliser l'IPv4 en priorité pour éviter l'erreur ENETUNREACH (IPv6) sur Railway
-dns.setDefaultResultOrder('ipv4first');
+const resolve4 = promisify(dns.resolve4);
 
-// Configuration du transporteur avec variables d'environnement
-// Si aucun port n'est spécifié, on utilise 465 (plus fiable sur Railway)
+// Fonction pour obtenir l'IPv4 de l'hôte SMTP
+async function getSmtpHost() {
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  try {
+    // Si c'est déjà une IP, on la retourne
+    if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host)) return host;
+
+    console.log(`🔍 Résolution IPv4 pour ${host}...`);
+    const addresses = await resolve4(host);
+    console.log(`✅ IPv4 trouvée : ${addresses[0]}`);
+    return addresses[0];
+  } catch (error) {
+    console.error(`⚠️ Échec résolution IPv4 pour ${host}, utilisation du nom d'hôte :`, error);
+    return host;
+  }
+}
+
 const smtpPort = parseInt(process.env.SMTP_PORT || '465');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: smtpPort,
-  secure: smtpPort === 465, // True pour 465, False pour 587
-  auth: {
-    user: process.env.SMTP_USER || '',
-    pass: process.env.SMTP_PASS || '',
-  },
-  tls: {
-    rejectUnauthorized: false, // Évite les erreurs de certificat
-    minVersion: 'TLSv1.2'
-  },
-  // Force l'IPv4 et log l'adresse IP pour le debug
-  lookup: (hostname: string, options: any, callback: any) => {
-    dns.lookup(hostname, { family: 4 }, (err, address, family) => {
-      if (!err) console.log(`🔍 Connexion SMTP via IPv${family} : ${address}`);
-      callback(err, address, family);
-    });
-  },
-  connectionTimeout: 15000, // Augmenté à 15s pour Railway
-  greetingTimeout: 15000,
-  socketTimeout: 20000,
-} as any);
-// Vérifier la configuration du transporteur de manière asynchrone sans bloquer le démarrage
+// On crée une fonction pour obtenir le transporteur car on a besoin d'attendre la résolution IP
+async function createTransporter() {
+  const hostIp = await getSmtpHost();
+
+  return nodemailer.createTransport({
+    host: hostIp,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    auth: {
+      user: process.env.SMTP_USER || '',
+      pass: process.env.SMTP_PASS || '',
+    },
+    tls: {
+      rejectUnauthorized: false,
+      servername: process.env.SMTP_HOST || 'smtp.gmail.com' // CRITIQUE : Garder le nom d'hôte pour le certificat SSL
+    },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
+  } as any);
+}
+
+let transporterPromise = createTransporter();
+
+// Vérification silencieuse au démarrage
 (async () => {
   try {
+    const transporter = await transporterPromise;
     await transporter.verify();
-    console.log('✅ Serveur de messagerie prêt à envoyer des messages');
+    console.log('✅ Serveur de messagerie prêt (IPv4 forcée)');
   } catch (error) {
     console.error('❌ Erreur configuration SMTP:', error);
   }
@@ -43,6 +60,8 @@ const transporter = nodemailer.createTransport({
 
 export async function sendVerificationEmail(to: string, refugeName: string, code: string) {
   console.log(`📧 Tentative d'envoi d'email à ${to}...`);
+  const transporter = await transporterPromise;
+
   const mailOptions = {
     from: `"MatchPet" <${process.env.SMTP_USER || 'noreply@matchpet.fr'}>`,
     to,
