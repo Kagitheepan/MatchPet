@@ -18,8 +18,10 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
-  // @ts-ignore - 'family' est supporté par nodemailer pour forcer l'IPv4 mais peut manquer dans les types
-  family: 4, 
+  // FONCTION CRITIQUE : Force la résolution DNS à ne retourner que de l'IPv4
+  lookup: (hostname: string, options: any, callback: any) => {
+    dns.lookup(hostname, { family: 4 }, callback);
+  },
   connectionTimeout: 10000, 
   greetingTimeout: 10000,
   socketTimeout: 10000,
