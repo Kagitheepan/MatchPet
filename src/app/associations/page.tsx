@@ -662,20 +662,23 @@ export default function AssociationsPage() {
                     <p>Aucun message. Démarrez la conversation !</p>
                   </div>
                 ) : (
-                  chatMessages.map(msg => (
-                    <div key={msg.id} className={`flex ${msg.senderType === 'REFUGE' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] sm:max-w-[75%] px-3 md:px-4 py-2 md:py-2.5 rounded-2xl text-xs md:text-sm font-medium ${
-                        msg.senderType === 'REFUGE'
-                          ? 'bg-primary text-white rounded-br-md'
-                          : 'bg-gray-100 text-text-dark rounded-bl-md'
-                      }`}>
-                        <p className="break-words">{msg.content}</p>
-                        <p className={`text-[9px] md:text-[10px] mt-1 ${msg.senderType === 'REFUGE' ? 'text-white/60' : 'text-gray-400'}`}>
-                          {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
+                  chatMessages.map(msg => {
+                    const isRefuge = msg.senderType?.toUpperCase() === 'REFUGE';
+                    return (
+                      <div key={msg.id} className={`flex ${isRefuge ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] sm:max-w-[75%] px-3 md:px-4 py-2 md:py-2.5 rounded-2xl text-xs md:text-sm font-medium text-white ${
+                          isRefuge 
+                            ? 'bg-pink-500 rounded-br-md' 
+                            : 'bg-green-600 rounded-bl-md'
+                        }`}>
+                          <p className="break-words">{msg.content}</p>
+                          <p className="text-[9px] md:text-[10px] mt-1 text-white/70">
+                            {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
                 <div ref={chatEndRef} />
               </div>

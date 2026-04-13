@@ -268,20 +268,23 @@ export default function Header() {
                   <p className="text-gray-400 font-medium">Posez vos questions au refuge ici !</p>
                 </div>
               ) : (
-                messages.map((msg: any) => (
-                  <div key={msg.id} className={`flex ${msg.senderType === 'USER' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm font-medium ${
-                      msg.senderType === 'USER'
-                        ? 'bg-primary text-white rounded-br-md'
-                        : 'bg-gray-100 text-text-dark rounded-bl-md'
-                    }`}>
-                      <p className="break-words leading-relaxed">{msg.content}</p>
-                      <p className={`text-[10px] mt-1.5 font-bold ${msg.senderType === 'USER' ? 'text-white/60' : 'text-gray-400'}`}>
-                        {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
+                messages.map((msg: any) => {
+                  const isUser = msg.senderType?.toUpperCase() === 'USER';
+                  return (
+                    <div key={msg.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm font-medium text-white ${
+                        isUser
+                          ? 'bg-green-600 rounded-br-md'
+                          : 'bg-pink-500 rounded-bl-md'
+                      }`}>
+                        <p className="break-words leading-relaxed">{msg.content}</p>
+                        <p className="text-[10px] mt-1.5 font-bold text-white/70">
+                          {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
               <div ref={chatEndRef} />
             </div>
