@@ -12,21 +12,21 @@
 
 */
 -- AlterTable
-ALTER TABLE `animal` DROP COLUMN `isHousetrained`,
+ALTER TABLE `Animal` DROP COLUMN `isHousetrained`,
     DROP COLUMN `isMixedBreed`,
     DROP COLUMN `isSpayedNeutered`,
     DROP COLUMN `isVaccinated`,
     DROP COLUMN `status`;
 
 -- AlterTable
-ALTER TABLE `refuge` DROP COLUMN `email`,
+ALTER TABLE `Refuge` DROP COLUMN `email`,
     ADD COLUMN `email_refuge` VARCHAR(191) NOT NULL,
     ADD COLUMN `isVerified` BOOLEAN NOT NULL DEFAULT false,
     ADD COLUMN `password` VARCHAR(191) NULL,
     ADD COLUMN `verificationCode` VARCHAR(191) NULL;
 
 -- AlterTable
-ALTER TABLE `userprofile` ADD COLUMN `password` VARCHAR(191) NULL,
+ALTER TABLE `UserProfile` ADD COLUMN `password` VARCHAR(191) NULL,
     ADD COLUMN `phone` VARCHAR(191) NULL,
     MODIFY `location` VARCHAR(191) NULL;
 
