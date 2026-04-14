@@ -1,0 +1,16 @@
+node_modules
+.next
+out
+build
+*.zip
+public.zip
+server.zip
+.git
+.env
+tsc.log
+tsconfig.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vercel
