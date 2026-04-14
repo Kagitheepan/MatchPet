@@ -28,7 +28,7 @@ export function Model(props: any) {
   const group = React.useRef<THREE.Group>(null)
   const { scene, animations } = useGLTF('/dog.glb')
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
-  const { nodes, materials } = useGraph(clone) as GLTFResult
+  const { nodes, materials } = useGraph(clone) as unknown as GLTFResult
   const { actions } = useAnimations(animations, group)
   
   React.useEffect(() => {
