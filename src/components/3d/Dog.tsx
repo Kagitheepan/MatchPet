@@ -20,17 +20,22 @@ type GLTFResult = GLTF & {
     shiba_inu2: THREE.SkinnedMesh
     root4: THREE.Bone
   }
-  materials: {}
+  materials: {
+    [key: string]: THREE.MeshStandardMaterial
+  }
   animations: GLTFAction[]
 }
 
-export function Model(props: any) {
+export function Model(props: JSX.IntrinsicElements['group']) {
   const group = React.useRef<THREE.Group>(null)
-  const { scene, animations } = useGLTF('/dog.glb')
+  const { scene, animations, materials: gltfMaterials } = useGLTF('/dog.glb')
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { nodes, materials } = useGraph(clone) as unknown as GLTFResult
   const { actions } = useAnimations(animations, group)
   
+  // Combine materials from GLTF and useGraph to be safe
+  const targetMaterial = materials.material_0 || materials.Material_0 || gltfMaterials?.material_0 || gltfMaterials?.Material_0 || nodes.shiba_inu2.material as THREE.MeshStandardMaterial;
+
   React.useEffect(() => {
     if (actions['standing']) {
       actions['standing'].reset().fadeIn(0.5).play()
@@ -44,7 +49,18 @@ export function Model(props: any) {
       <group>
         <group name="RootNode0" scale={0.01}>
           <group name="geo1">
-            <skinnedMesh name="shiba_inu2" geometry={nodes.shiba_inu2.geometry} material={nodes.shiba_inu2.material} skeleton={nodes.shiba_inu2.skeleton} />
+            <skinnedMesh 
+              name="shiba_inu2" 
+              geometry={nodes.shiba_inu2.geometry} 
+              skeleton={nodes.shiba_inu2.skeleton}
+            >
+              <meshStandardMaterial 
+                map={targetMaterial?.map || null}
+                color={targetMaterial?.map ? "#ffffff" : "#d89e65"}
+                roughness={0.7}
+                metalness={0.1}
+              />
+            </skinnedMesh>
           </group>
           <group name="skeletal3">
             <primitive object={nodes.root4} />
