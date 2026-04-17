@@ -62,7 +62,7 @@ export default async function Home() {
         <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 md:grid md:grid-cols-3 md:gap-10 pb-8 no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
           {latestAnimals.length > 0 ? latestAnimals.map((animal) => {
              const photos = animal.photos as string[] | null;
-             const imageUrl = photos && photos.length > 0 ? photos[0] : "https://images.unsplash.com/photo-1543466835-00a7907e9de1"; // fallback si pas d'image
+             const imageUrl = photos && photos.length > 0 ? photos[0] : getFallbackImage(animal.species);
              const speciesFr = speciesMap[animal.species] || animal.species;
 
              return (

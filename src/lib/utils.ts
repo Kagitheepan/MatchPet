@@ -16,6 +16,9 @@ export function getFallbackImage(species?: string): string {
     case 'bird':
     case 'oiseau':
       return 'https://images.unsplash.com/photo-1552728089-57473a242c16?w=500';
+    case 'other':
+    case 'autre':
+      return 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=500';
     case 'dog':
     case 'chien':
     default:

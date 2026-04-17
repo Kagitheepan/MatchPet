@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Users, PlusCircle, FileText, LogOut, Check, X, Eye, Clock, CheckCircle, XCircle, MessageCircle, Send, ArrowLeft } from "lucide-react";
+import { getFallbackImage } from "@/lib/utils";
 
 type TabType = "animals" | "addAnimal" | "adoptions" | "messages";
 
@@ -505,11 +506,12 @@ export default function AssociationsPage() {
                 {animals.map(animal => (
                   <div key={animal.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                     <div className="relative w-full h-40 md:h-44">
-                      {animal.photos && Array.isArray(animal.photos) && animal.photos[0] ? (
-                        <Image src={animal.photos[0]} alt={animal.name} fill className="object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-4xl md:text-5xl">🐾</div>
-                      )}
+                      <Image 
+                        src={animal.photos && Array.isArray(animal.photos) && animal.photos[0] ? animal.photos[0] : getFallbackImage(animal.species)} 
+                        alt={animal.name} 
+                        fill 
+                        className="object-cover" 
+                      />
                     </div>
                     <div className="p-4">
                       <h3 className="font-bold text-lg text-text-dark">{animal.name}</h3>
