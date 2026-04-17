@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Heart } from "lucide-react";
 import DesktopScene from "@/components/3d/DesktopScene";
 import { prisma } from "@/lib/prisma";
+import HomeMatcherButton from "@/components/ui/HomeMatcherButton";
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
@@ -47,11 +48,7 @@ export default async function Home() {
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8 mt-6">
         <div className="w-full h-[55vh] md:h-[65vh] rounded-[2rem] overflow-hidden relative shadow-md bg-[#f6f7f5] border border-gray-100">
           <DesktopScene model="dog" />
-          <Link href="/onboarding" className="absolute bottom-5 right-5 md:bottom-8 md:right-8 z-20">
-             <button className="bg-secondary-dark text-white font-cursive text-3xl md:text-4xl px-8 py-3 rounded-full shadow-lg hover:scale-105 transition-transform border border-white/20 hover:shadow-xl">
-              Matcher !
-             </button>
-          </Link>
+          <HomeMatcherButton />
         </div>
       </div>
 
