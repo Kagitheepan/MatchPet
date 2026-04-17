@@ -41,8 +41,8 @@ describe('Composant Questionnaire', () => {
     fireEvent.click(screen.getByText('Pas d\'importance'))
     fireEvent.click(screen.getByText('Suivant'))
     
-    // Question 5: Quel genre
-    fireEvent.click(screen.getByText('Pas d\'importance'))
+    // Question 5: Jardin (Single)
+    fireEvent.click(screen.getByText('Non'))
     
     // Vérifier le bouton Terminer
     expect(screen.getByText('Terminer')).toBeInTheDocument()

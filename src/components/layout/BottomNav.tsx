@@ -5,21 +5,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, Heart, User, Users, MessageCircle } from "lucide-react";
 
+interface UserData {
+  email?: string;
+  firstName?: string;
+}
+
 export default function BottomNav() {
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
-  const [refuge, setRefuge] = useState<any>(null);
+  const [user, setUser] = useState<UserData | null>(null);
 
   useEffect(() => {
     const loggedUser = JSON.parse(localStorage.getItem('current_user') || 'null');
-    const loggedRefuge = JSON.parse(localStorage.getItem('matchpet_refuge') || 'null');
-    setUser(loggedUser);
-    setRefuge(loggedRefuge);
+    Promise.resolve().then(() => setUser(loggedUser));
 
     // Listen for storage changes in case of login/logout in the same tab
     const handleStorage = () => {
       setUser(JSON.parse(localStorage.getItem('current_user') || 'null'));
-      setRefuge(JSON.parse(localStorage.getItem('matchpet_refuge') || 'null'));
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);

@@ -2,27 +2,44 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, MapPin, Heart, Cat } from "lucide-react";
+import { X, Check, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
+interface MappedAnimal {
+  id: string;
+  name: string;
+  species: string;
+  description: string;
+  location: string;
+  image: string;
+  distance: string;
+}
+
+interface AnimalFromAPI {
+  id: number | string;
+  name: string;
+  species?: string;
+  description?: string;
+  photos?: string[] | null | unknown;
+  refuge?: {
+    city?: string;
+  } | null;
+}
 
 export default function MatchPage() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [animals, setAnimals] = useState<any[]>([]);
+  const [animals, setAnimals] = useState<MappedAnimal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const [isUserConnected, setIsUserConnected] = useState(false);
-  const [likedAnimals, setLikedAnimals] = useState<any[]>([]);
+  const [likedAnimals, setLikedAnimals] = useState<MappedAnimal[]>([]);
 
   useEffect(() => {
     // Load liked animals initially
     const savedLikes = JSON.parse(localStorage.getItem('liked_animals') || '[]');
     setLikedAnimals(savedLikes);
-
-    const loggedUser = JSON.parse(localStorage.getItem('current_user') || 'null');
-    setIsUserConnected(!!loggedUser);
 
     const fetchMatches = async () => {
       let hasChildren = false;
@@ -44,7 +61,9 @@ export default function MatchPage() {
           if (Array.isArray(parsed.desiredAge)) {
             desiredAge = parsed.desiredAge;
           }
-        } catch (e) {}
+        } catch {
+          // Ignore parse errors
+        }
       }
 
       try {
@@ -55,7 +74,7 @@ export default function MatchPage() {
         
         const data = await response.json();
         
-        const mappedData = data.map((animal: any) => ({
+        const mappedData = data.map((animal: AnimalFromAPI) => ({
           id: animal.id.toString(),
           name: animal.name,
           species: animal.species || 'Unknown',
@@ -78,7 +97,7 @@ export default function MatchPage() {
 
     // Toujours récupérer les matchs
     fetchMatches();
-  }, [router]);
+  }, []); // Remove router dependency to avoid infinite loops in tests
 
   const handleSwipe = (direction: 'left' | 'right') => {
     const currentProfile = animals[currentIndex];

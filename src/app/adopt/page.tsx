@@ -6,25 +6,44 @@ import { Check, Heart } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+interface User {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
+interface LikedAnimal {
+  id: string;
+  image?: string;
+}
+
 function AdoptForm() {
   const [submitted, setSubmitted] = useState(false);
   const [animalName, setAnimalName] = useState<string>("cet animal");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sessionUser, setSessionUser] = useState<any>(null);
+  const [sessionUser, setSessionUser] = useState<User | null>(null);
   const [isLoginMode, setIsLoginMode] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const name = searchParams.get("name");
-    if (name) {
-      setAnimalName(name);
+    if (name && name !== animalName) {
+      Promise.resolve().then(() => setAnimalName(name));
     }
-    const loggedUser = JSON.parse(localStorage.getItem('current_user') || 'null');
-    if (loggedUser && loggedUser.email) {
-       setSessionUser(loggedUser);
+    const loggedUserStr = localStorage.getItem('current_user');
+    if (loggedUserStr) {
+      try {
+        const loggedUser = JSON.parse(loggedUserStr);
+        if (loggedUser && loggedUser.email && (!sessionUser || loggedUser.email !== sessionUser.email)) {
+          Promise.resolve().then(() => setSessionUser(loggedUser));
+        }
+      } catch {
+        // Handle error
+      }
     }
-  }, [searchParams]);
+  }, [searchParams, animalName, sessionUser]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,8 +52,8 @@ function AdoptForm() {
 
     const id = searchParams.get("animalId");
     
-    const savedLikes = JSON.parse(localStorage.getItem('liked_animals') || '[]');
-    const adoptedAnimal = savedLikes.find((a: any) => a.id === id);
+    const savedLikes: LikedAnimal[] = JSON.parse(localStorage.getItem('liked_animals') || '[]');
+    const adoptedAnimal = savedLikes.find((a) => a.id === id);
 
     let data;
     if (sessionUser) {
@@ -81,11 +100,11 @@ function AdoptForm() {
       } else {
         // Inscription directe
         data = {
-          firstName: formData.get("firstName"),
-          lastName: formData.get("lastName"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-          password: formData.get("password"),
+          firstName: formData.get("firstName") as string,
+          lastName: formData.get("lastName") as string,
+          email: formData.get("email") as string,
+          phone: formData.get("phone") as string,
+          password: formData.get("password") as string,
           animalName: animalName,
           animalId: id,
           animalImage: adoptedAnimal?.image || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500'
@@ -114,7 +133,7 @@ function AdoptForm() {
     setIsSubmitting(false);
 
     if (id) {
-       const updated = savedLikes.filter((a: any) => a.id !== id);
+       const updated = savedLikes.filter((a) => a.id !== id);
        localStorage.setItem('liked_animals', JSON.stringify(updated));
     }
   };
@@ -152,7 +171,7 @@ function AdoptForm() {
         <p className="text-gray-500 font-medium mb-8 relative z-10 text-sm md:text-base">
           {sessionUser ? 
             "Vous êtes déjà connecté ! Cliquez simplement pour finaliser votre demande avec les coordonnées de votre profil." :
-            "Pour finaliser votre demande d'adoption, veuillez vous identifier ou créer votre compte."
+            "Pour finaliser votre demande d&apos;adoption, veuillez vous identifier ou créer votre compte."
           }
         </p>
 
@@ -213,7 +232,7 @@ function AdoptForm() {
           )}
 
           <Button disabled={isSubmitting} type="submit" variant="primary" className="w-full text-xl h-[3.5rem] md:h-[4rem] group mt-4 shadow-md hover:shadow-lg transition-all rounded-[2rem] disabled:opacity-70 disabled:cursor-not-allowed">
-            {isSubmitting ? "Envoi en cours..." : (isLoginMode ? "S'identifier et Adopter" : "Confirmer l'adoption")}
+            {isSubmitting ? "Envoi en cours..." : (isLoginMode ? "S&apos;identifier et Adopter" : "Confirmer l&apos;adoption")}
             {!isSubmitting && <Heart className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform fill-current text-primary-dark group-hover:text-white" />}
           </Button>
         </form>

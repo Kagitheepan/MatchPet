@@ -111,7 +111,7 @@ export default async function Home() {
                 <span className="font-cursive text-white text-2xl font-bold tracking-wide">Nutrition</span>
              </div>
              <p className="text-[15px] text-text-dark font-medium my-6 text-center px-4 leading-relaxed">
-               Lutter efficacement<br/>contre l'obésité.
+               Lutter efficacement<br/>contre l&apos;obésité.
              </p>
              <button className="bg-secondary-dark text-white font-cursive text-2xl px-6 py-2 rounded-full shadow-md mt-auto hover:bg-secondary transition-colors w-[85%]">
                En savoir +

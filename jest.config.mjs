@@ -12,6 +12,8 @@ const config = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^framer-motion$': '<rootDir>/__mocks__/framer-motion.js',
+    '^lucide-react$': '<rootDir>/__mocks__/lucide-react.js',
   },
 }
 

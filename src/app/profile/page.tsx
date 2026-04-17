@@ -5,9 +5,16 @@ import { User, Archive, Bell, PieChart, FolderHeart, Cat, Navigation, ArrowRight
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 
+interface UserData {
+  id: number;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
-  const [sessionUser, setSessionUser] = useState<any>(null);
+  const [sessionUser, setSessionUser] = useState<UserData | null>(null);
 
   const [showAuth, setShowAuth] = useState(false);
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -74,8 +81,9 @@ export default function ProfilePage() {
           setSessionUser(data.user);
         }
       }
-    } catch (err: any) {
-      setAuthError(err.message || "Erreur d'authentification");
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setAuthError(error.message || "Erreur d'authentification");
     } finally {
       setLoading(false);
     }

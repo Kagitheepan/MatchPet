@@ -79,8 +79,9 @@ export async function GET(request: Request) {
     })
 
     return NextResponse.json(animals)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in matching API:', error)
-    return NextResponse.json({ error: error.message || error.toString() }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

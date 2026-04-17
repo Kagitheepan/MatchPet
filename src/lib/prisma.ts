@@ -13,7 +13,7 @@ try {
   // Pass connection string directly to the adapter
   const adapter = new PrismaMariaDb(connectionString)
   client = globalForPrisma.prisma ?? new PrismaClient({ adapter })
-} catch (err) {
+} catch {
   client = globalForPrisma.prisma ?? new PrismaClient()
 }
 

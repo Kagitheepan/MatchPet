@@ -41,7 +41,7 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { currentEmail, firstName, lastName, phone } = body;
 
-    const updated = await prisma.userProfile.update({
+    await prisma.userProfile.update({
       where: { email: currentEmail },
       data: {
         name: `${firstName} ${lastName}`.trim(),

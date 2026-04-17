@@ -8,42 +8,61 @@ import { Button } from "@/components/ui/Button";
 
 type AdoptionStatus = 'pending' | 'reviewing' | 'approved' | 'rejected';
 
+interface Adoption {
+  id: string | number;
+  name: string;
+  image?: string;
+  status: AdoptionStatus;
+  location?: string;
+  requestDate: string;
+}
+
 export default function AdoptionsPage() {
-  const [adoptions, setAdoptions] = useState<any[]>([]);
+  const [adoptions, setAdoptions] = useState<Adoption[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('current_user') || 'null');
-    
-    if (user && user.firstName) {
-      setUserName(user.firstName);
+    const userStr = localStorage.getItem('current_user');
+    if (!userStr) {
+      Promise.resolve().then(() => setLoading(false));
+      return;
     }
-    
-    if (user && user.email) {
-      fetch(`/api/adoptions?email=${encodeURIComponent(user.email)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            setAdoptions(data);
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error(err);
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
+
+    try {
+      const user = JSON.parse(userStr);
+      
+      if (user && user.firstName && user.firstName !== userName) {
+        Promise.resolve().then(() => setUserName(user.firstName));
+      }
+      
+      if (user && user.email) {
+        fetch(`/api/adoptions?email=${encodeURIComponent(user.email)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              setAdoptions(data);
+            }
+            setLoading(false);
+          })
+          .catch(err => {
+            console.error(err);
+            setLoading(false);
+          });
+      } else {
+        Promise.resolve().then(() => setLoading(false));
+      }
+    } catch {
+      Promise.resolve().then(() => setLoading(false));
     }
-  }, []);
+  }, [userName]);
 
   const getStatusInfo = (status: AdoptionStatus) => {
     switch(status) {
       case 'pending':
-        return { label: "En attente d'examen", color: "text-amber-600", bg: "bg-amber-100", bar: "bg-amber-500", progress: 25, icon: Clock };
+        return { label: "En attente d&apos;examen", color: "text-amber-600", bg: "bg-amber-100", bar: "bg-amber-500", progress: 25, icon: Clock };
       case 'reviewing':
-        return { label: "Dossier en cours d'étude", color: "text-blue-600", bg: "bg-blue-100", bar: "bg-blue-500", progress: 60, icon: FileText };
+        return { label: "Dossier en cours d&apos;étude", color: "text-blue-600", bg: "bg-blue-100", bar: "bg-blue-500", progress: 60, icon: FileText };
       case 'approved':
         return { label: "Adoption validée", color: "text-green-600", bg: "bg-green-100", bar: "bg-green-500", progress: 100, icon: CheckCircle2 };
       case 'rejected':
@@ -68,7 +87,7 @@ export default function AdoptionsPage() {
         <h1 className="font-cursive text-4xl md:text-5xl text-text-dark font-bold mb-3">
           {userName ? `Les Adoptions de ${userName}` : "Mes Adoptions"}
         </h1>
-        <p className="text-gray-500 font-medium mb-8 md:mb-12">Suivez l'évolution de vos demandes d'adoptions en temps réel.</p>
+        <p className="text-gray-500 font-medium mb-8 md:mb-12">Suivez l&apos;évolution de vos demandes d&apos;adoptions en temps réel.</p>
         
         {loading ? (
           <div className="flex justify-center p-12">
@@ -78,7 +97,7 @@ export default function AdoptionsPage() {
           <div className="bg-white rounded-[3rem] p-12 text-center shadow-sm border border-gray-50 flex flex-col items-center">
             <FileText className="w-16 h-16 text-gray-300 mb-4" />
             <h2 className="text-2xl font-bold text-text-dark mb-2">Aucun dossier en cours</h2>
-            <p className="text-gray-500 font-medium mb-8 max-w-sm">Vous n'avez pas encore fait de demande d'adoption.</p>
+            <p className="text-gray-500 font-medium mb-8 max-w-sm">Vous n&apos;avez pas encore fait de demande d&apos;adoption.</p>
             <Link href="/match">
               <Button variant="primary" className="h-12 px-8">Trouver mon compagnon</Button>
             </Link>
@@ -120,7 +139,7 @@ export default function AdoptionsPage() {
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${status.bg}`}>
                           <StatusIcon className={`w-4 h-4 ${status.color}`} />
                         </div>
-                        <span className={`font-bold text-sm ${status.color}`}>{status.label}</span>
+                        <span className={`font-bold text-sm ${status.color}`} dangerouslySetInnerHTML={{ __html: status.label }} />
                       </div>
                       
                       {status.progress === 100 && adoption.status === 'approved' && (

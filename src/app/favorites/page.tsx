@@ -6,14 +6,29 @@ import { Heart, MapPin, HeartCrack } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 
+interface FavoritePet {
+  id: string;
+  name: string;
+  image: string;
+  location: string;
+  description: string;
+}
+
 export default function FavoritesPage() {
-  const [animals, setAnimals] = useState<any[]>([]);
+  const [animals, setAnimals] = useState<FavoritePet[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedLikes = JSON.parse(localStorage.getItem('liked_animals') || '[]');
-    setAnimals(savedLikes);
-    setLoading(false);
+    const savedLikesStr = localStorage.getItem('liked_animals') || '[]';
+    try {
+      const savedLikes = JSON.parse(savedLikesStr);
+      if (Array.isArray(savedLikes)) {
+        Promise.resolve().then(() => setAnimals(savedLikes));
+      }
+    } catch {
+      // Handle error
+    }
+    Promise.resolve().then(() => setLoading(false));
   }, []);
 
   const removeFavorite = (id: string, e: React.MouseEvent) => {
@@ -51,7 +66,7 @@ export default function FavoritesPage() {
                 
                 <Link href={`/adopt?animalId=${pet.id}&name=${encodeURIComponent(pet.name)}`}>
                   <Button variant="primary" className="w-full text-xl h-[3.2rem] shadow-md transition-all mt-auto bg-primary text-primary-dark hover:bg-primary-dark hover:text-white">
-                    L'adopter
+                    L&apos;adopter
                   </Button>
                 </Link>
               </div>

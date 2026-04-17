@@ -8,7 +8,7 @@ export default function EmptyMatchPage() {
       <div className="w-full flex justify-start mb-6">
         <Link href="/" className="flex items-center text-text-dark font-medium italic text-sm hover:text-primary-dark transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Revenir à l'accueil
+          Revenir à l&apos;accueil
         </Link>
       </div>
 

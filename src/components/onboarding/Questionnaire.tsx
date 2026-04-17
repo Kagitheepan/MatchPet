@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
-import { Check, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 type QuestionType = "single" | "multiple";
 interface Option { label: string; value: string; }

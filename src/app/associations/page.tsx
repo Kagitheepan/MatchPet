@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
-import { Users, PlusCircle, FileText, LogOut, ChevronDown, Check, X, Eye, Clock, CheckCircle, XCircle, MessageCircle, Send, ArrowLeft } from "lucide-react";
+import { Users, PlusCircle, FileText, LogOut, Check, X, Eye, Clock, CheckCircle, XCircle, MessageCircle, Send, ArrowLeft } from "lucide-react";
 
 type TabType = "animals" | "addAnimal" | "adoptions" | "messages";
 
@@ -26,10 +27,25 @@ interface AdoptionData {
   status: string;
   createdAt: string;
   user: { name?: string; email: string; phone?: string };
+  hasUnreadRefuge?: boolean;
+}
+
+interface Message {
+  id: number;
+  content: string;
+  senderType: string;
+  createdAt: string;
+}
+
+interface Refuge {
+  id: number;
+  name: string;
+  email: string;
+  city: string;
 }
 
 export default function AssociationsPage() {
-  const [refuge, setRefuge] = useState<any>(null);
+  const [refuge, setRefuge] = useState<Refuge | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Auth
@@ -59,7 +75,7 @@ export default function AssociationsPage() {
 
   // Chat
   const [chatAdoption, setChatAdoption] = useState<AdoptionData | null>(null);
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -85,16 +101,38 @@ export default function AssociationsPage() {
     if (stored) {
       try {
         setRefuge(JSON.parse(stored));
-      } catch {}
+      } catch {
+        // Handle error
+      }
     }
     setLoading(false);
   }, []);
 
+  const fetchAnimals = async (refugeId: number) => {
+    try {
+      const res = await fetch(`/api/admin/animals?refugeId=${refugeId}`);
+      const data = await res.json();
+      if (Array.isArray(data)) setAnimals(data);
+    } catch {
+      // Handle error
+    }
+  };
+
+  const fetchAdoptions = async (refugeId: number) => {
+    try {
+      const res = await fetch(`/api/admin/adoptions?refugeId=${refugeId}`);
+      const data = await res.json();
+      if (Array.isArray(data)) setAdoptions(data);
+    } catch {
+      // Handle error
+    }
+  };
+
   useEffect(() => {
     if (refuge?.id) {
-      fetchAnimals();
-      fetchAdoptions();
-      const interval = setInterval(fetchAdoptions, 30000);
+      fetchAnimals(refuge.id);
+      fetchAdoptions(refuge.id);
+      const interval = setInterval(() => fetchAdoptions(refuge.id), 30000);
       return () => clearInterval(interval);
     }
   }, [refuge]);
@@ -106,28 +144,14 @@ export default function AssociationsPage() {
           const res = await fetch(`/api/messages?adoptionId=${chatAdoption.id}&viewerType=refuge`);
           const data = await res.json();
           if (Array.isArray(data)) setChatMessages(data);
-        } catch {}
+        } catch {
+          // Handle error
+        }
       };
       const interval = setInterval(fetchMessages, 5000);
       return () => clearInterval(interval);
     }
   }, [chatAdoption]);
-
-  const fetchAnimals = async () => {
-    try {
-      const res = await fetch(`/api/admin/animals?refugeId=${refuge.id}`);
-      const data = await res.json();
-      if (Array.isArray(data)) setAnimals(data);
-    } catch {}
-  };
-
-  const fetchAdoptions = async () => {
-    try {
-      const res = await fetch(`/api/admin/adoptions?refugeId=${refuge.id}`);
-      const data = await res.json();
-      if (Array.isArray(data)) setAdoptions(data);
-    } catch {}
-  };
 
   // ── Auth handlers ──
   const handleRegister = async (e: React.FormEvent) => {
@@ -147,8 +171,8 @@ export default function AssociationsPage() {
       setSuccessMsg("Inscription réussie ! Vous pouvez maintenant vous connecter.");
       // Reset register fields
       setRegName(""); setRegEmail(""); setRegPassword(""); setRegPhone(""); setRegAddress(""); setRegCity(""); setRegPostalCode("");
-    } catch (err: any) {
-      setAuthError(err.message);
+    } catch (err: unknown) {
+      setAuthError(err instanceof Error ? err.message : String(err));
     } finally {
       setSubmitting(false);
     }
@@ -168,8 +192,8 @@ export default function AssociationsPage() {
       if (data.error) throw new Error(data.error);
       localStorage.setItem("matchpet_refuge", JSON.stringify(data.refuge));
       setRefuge(data.refuge);
-    } catch (err: any) {
-      setAuthError(err.message);
+    } catch (err: unknown) {
+      setAuthError(err instanceof Error ? err.message : String(err));
     } finally {
       setSubmitting(false);
     }
@@ -183,6 +207,7 @@ export default function AssociationsPage() {
   // ── Add animal ──
   const handleAddAnimal = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!refuge) return;
     setSubmitting(true);
     setSuccessMsg("");
     try {
@@ -205,9 +230,9 @@ export default function AssociationsPage() {
       setAnimalName(""); setAnimalBreed(""); setAnimalDescription(""); setAnimalPhotoUrl("");
       setAnimalPhotos([]);
       setGoodWithChildren(false); setGoodWithDogs(false); setGoodWithCats(false); setNeedsGarden(false);
-      fetchAnimals();
-    } catch (err: any) {
-      setAuthError(err.message);
+      fetchAnimals(refuge.id);
+    } catch (err: unknown) {
+      setAuthError(err instanceof Error ? err.message : String(err));
     } finally {
       setSubmitting(false);
     }
@@ -238,8 +263,10 @@ export default function AssociationsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adoptionId, status }),
       });
-      fetchAdoptions();
-    } catch {}
+      if (refuge) fetchAdoptions(refuge.id);
+    } catch {
+      // Handle error
+    }
   };
 
   const handleDeleteAdoption = async (adoptionId: number) => {
@@ -248,8 +275,10 @@ export default function AssociationsPage() {
       await fetch(`/api/admin/adoptions?adoptionId=${adoptionId}`, {
         method: "DELETE",
       });
-      fetchAdoptions();
-    } catch {}
+      if (refuge) fetchAdoptions(refuge.id);
+    } catch {
+      // Handle error
+    }
   };
 
   // ── Chat ──
@@ -260,7 +289,9 @@ export default function AssociationsPage() {
       const res = await fetch(`/api/messages?adoptionId=${adoption.id}&viewerType=refuge`);
       const data = await res.json();
       if (Array.isArray(data)) setChatMessages(data);
-    } catch {}
+    } catch {
+      // Handle error
+    }
     setChatLoading(false);
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
@@ -284,7 +315,9 @@ export default function AssociationsPage() {
       const data = await res.json();
       if (Array.isArray(data)) setChatMessages(data);
       setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    } catch {}
+    } catch {
+      // Handle error
+    }
   };
 
   const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
@@ -311,7 +344,7 @@ export default function AssociationsPage() {
             <Users className="w-16 h-16 text-primary-dark mb-6" />
             <h2 className="text-3xl font-cursive font-bold text-text-dark mb-4">Espace Associations</h2>
             <p className="text-gray-500 font-medium mb-10 leading-relaxed">
-              Accédez à votre tableau de bord pour gérer vos animaux et vos dossiers d'adoption.
+              Accédez à votre tableau de bord pour gérer vos animaux et vos dossiers d&apos;adoption.
             </p>
             <Button onClick={() => { setShowAuth(true); setIsLoginMode(true); }} variant="primary" className="w-full h-14 text-lg font-bold shadow-md hover:scale-[1.02] transition-transform">
               Se connecter
@@ -337,9 +370,9 @@ export default function AssociationsPage() {
               </form>
             ) : (
               <form onSubmit={handleRegister} className="flex flex-col gap-4">
-                <input value={regName} onChange={e => setRegName(e.target.value)} placeholder="Nom de l'association *" required type="text"
+                <input value={regName} onChange={e => setRegName(e.target.value)} placeholder="Nom de l&apos;association *" required type="text"
                   className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary-dark outline-none font-medium transition-all" />
-                <input value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="Email de l'association *" required type="email"
+                <input value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="Email de l&apos;association *" required type="email"
                   className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary-dark outline-none font-medium transition-all" />
                 <input value={regPassword} onChange={e => setRegPassword(e.target.value)} placeholder="Mot de passe *" required type="password"
                   className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary-dark outline-none font-medium transition-all" />
@@ -357,7 +390,7 @@ export default function AssociationsPage() {
                 </div>
                 {authError && <p className="text-red-500 font-medium text-sm text-center">{authError}</p>}
                 <Button type="submit" variant="primary" className="w-full h-14 text-lg font-bold mt-2 shadow-md hover:scale-[1.02] transition-transform" disabled={submitting}>
-                  {submitting ? "..." : "S'inscrire"}
+                  {submitting ? "..." : "S&apos;inscrire"}
                 </Button>
               </form>
             )}
@@ -396,7 +429,7 @@ export default function AssociationsPage() {
           {([
             { id: "animals" as TabType, label: "Mes Animaux", icon: Users },
             { id: "addAnimal" as TabType, label: "Ajouter un Animal", icon: PlusCircle },
-            { id: "adoptions" as TabType, label: "Dossiers d'Adoption", icon: FileText },
+            { id: "adoptions" as TabType, label: "Dossiers d&apos;Adoption", icon: FileText },
             { id: "messages" as TabType, label: "Messages", icon: MessageCircle },
           ]).map(tab => (
             <button key={tab.id} onClick={() => { setActiveTab(tab.id); setSuccessMsg(""); }}
@@ -424,13 +457,13 @@ export default function AssociationsPage() {
                     onClick={() => openChat(adoption)}
                     className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:bg-gray-50 transition-all text-left group"
                   >
-                    <div className="relative shrink-0">
+                    <div className="relative shrink-0 w-14 h-14">
                       {adoption.animalImage ? (
-                        <img src={adoption.animalImage} alt={adoption.animalName} className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm" />
+                        <Image src={adoption.animalImage} alt={adoption.animalName} fill className="rounded-full object-cover border-2 border-white shadow-sm" />
                       ) : (
-                        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-2xl border-2 border-white shadow-sm">🐾</div>
+                        <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-2xl border-2 border-white shadow-sm">🐾</div>
                       )}
-                      {(adoption as any).hasUnreadRefuge && (
+                      {adoption.hasUnreadRefuge && (
                         <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary-dark rounded-full border-2 border-white animate-pulse" />
                       )}
                     </div>
@@ -444,7 +477,7 @@ export default function AssociationsPage() {
                       <p className="text-xs md:text-sm text-gray-500 font-medium truncate">
                         Avec {adoption.user.name || adoption.user.email}
                       </p>
-                      {(adoption as any).hasUnreadRefuge && (
+                      {adoption.hasUnreadRefuge && (
                         <p className="text-[10px] text-primary-dark font-bold mt-1 uppercase tracking-wider italic">Nouveau message</p>
                       )}
                     </div>
@@ -465,17 +498,19 @@ export default function AssociationsPage() {
               <div className="text-center py-16 md:py-20 text-gray-400">
                 <Users className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 opacity-40" />
                 <p className="font-medium text-base md:text-lg">Aucun animal enregistré.</p>
-                <p className="text-xs md:text-sm mt-2">Ajoutez votre premier animal via l'onglet dédié.</p>
+                <p className="text-xs md:text-sm mt-2">Ajoutez votre premier animal via l&apos;onglet dédié.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
                 {animals.map(animal => (
                   <div key={animal.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    {animal.photos && Array.isArray(animal.photos) && (animal.photos as string[])[0] ? (
-                      <img src={(animal.photos as string[])[0]} alt={animal.name} className="w-full h-40 md:h-44 object-cover" />
-                    ) : (
-                      <div className="w-full h-40 md:h-44 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-4xl md:text-5xl">🐾</div>
-                    )}
+                    <div className="relative w-full h-40 md:h-44">
+                      {animal.photos && Array.isArray(animal.photos) && animal.photos[0] ? (
+                        <Image src={animal.photos[0]} alt={animal.name} fill className="object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-4xl md:text-5xl">🐾</div>
+                      )}
+                    </div>
                     <div className="p-4">
                       <h3 className="font-bold text-lg text-text-dark">{animal.name}</h3>
                       <p className="text-gray-500 text-sm font-medium">{animal.species} {animal.breed ? `· ${animal.breed}` : ""}</p>
@@ -499,7 +534,7 @@ export default function AssociationsPage() {
               <h2 className="font-cursive text-2xl md:text-3xl font-bold text-text-dark mb-6 md:mb-8 text-center">Nouvel Animal</h2>
               {successMsg && <p className="text-green-600 font-medium text-sm text-center mb-6 bg-green-50 p-3 rounded-xl">{successMsg}</p>}
               <form onSubmit={handleAddAnimal} className="flex flex-col gap-4 md:gap-5">
-                <input value={animalName} onChange={e => setAnimalName(e.target.value)} placeholder="Nom de l'animal *" required
+                <input value={animalName} onChange={e => setAnimalName(e.target.value)} placeholder="Nom de l&apos;animal *" required
                   className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all text-sm md:text-base" />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -534,22 +569,22 @@ export default function AssociationsPage() {
                   </select>
                 </div>
 
-                <textarea value={animalDescription} onChange={e => setAnimalDescription(e.target.value)} placeholder="Description de l'animal..."
+                <textarea value={animalDescription} onChange={e => setAnimalDescription(e.target.value)} placeholder="Description de l&apos;animal..."
                   rows={3} className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all resize-none text-sm md:text-base" />
 
                 <div className="space-y-3">
-                  <p className="font-bold text-text-dark text-xs md:text-sm uppercase tracking-wide">Photos de l'animal</p>
+                  <p className="font-bold text-text-dark text-xs md:text-sm uppercase tracking-wide">Photos de l&apos;animal</p>
                   
                   {/* Preview des photos */}
                   {animalPhotos.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-2">
                       {animalPhotos.map((photo, index) => (
                         <div key={index} className="relative w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden border border-gray-200 group">
-                          <img src={photo} alt="Preview" className="w-full h-full object-cover" />
+                          <Image src={photo} alt="Preview" fill className="object-cover" />
                           <button 
                             type="button" 
                             onClick={() => removePhoto(index)}
-                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -576,7 +611,7 @@ export default function AssociationsPage() {
                         Ajouter depuis PC
                       </label>
                     </div>
-                    <input value={animalPhotoUrl} onChange={e => setAnimalPhotoUrl(e.target.value)} placeholder="Ou URL d'image"
+                    <input value={animalPhotoUrl} onChange={e => setAnimalPhotoUrl(e.target.value)} placeholder="Ou URL d&apos;image"
                       className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all text-sm md:text-base" />
                   </div>
                 </div>
@@ -611,14 +646,14 @@ export default function AssociationsPage() {
                 </div>
 
                 <Button type="submit" variant="primary" className="w-full h-12 md:h-14 text-base md:text-lg font-bold shadow-md hover:scale-[1.02] transition-transform mt-2" disabled={submitting}>
-                  {submitting ? "Ajout en cours..." : "Ajouter l'animal"}
+                  {submitting ? "Ajout en cours..." : "Ajouter l&apos;animal"}
                 </Button>
               </form>
             </div>
           </div>
         )}
 
-        {/* ── Tab: Dossiers d'adoption ── */}
+        {/* ── Tab: Dossiers d&apos;adoption ── */}
         {activeTab === "adoptions" && (
           <div className="space-y-4">
             {adoptions.length === 0 ? (
@@ -634,15 +669,17 @@ export default function AssociationsPage() {
                   return (
                     <div key={adoption.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-4">
                       <div className="flex items-center gap-4 flex-1">
-                        {adoption.animalImage ? (
-                          <img src={adoption.animalImage} alt={adoption.animalName} className="w-12 h-12 md:w-14 md:h-14 rounded-xl object-cover shrink-0" />
-                        ) : (
-                          <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-primary/10 flex items-center justify-center text-xl md:text-2xl shrink-0">🐾</div>
-                        )}
+                        <div className="relative w-12 h-12 md:w-14 md:h-14 shrink-0">
+                          {adoption.animalImage ? (
+                            <Image src={adoption.animalImage} alt={adoption.animalName} fill className="rounded-xl object-cover" />
+                          ) : (
+                            <div className="w-full h-full rounded-xl bg-primary/10 flex items-center justify-center text-xl md:text-2xl">🐾</div>
+                          )}
+                        </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <h3 className="font-bold text-text-dark truncate">{adoption.animalName}</h3>
-                            {(adoption as any).hasUnreadRefuge && (
+                            {adoption.hasUnreadRefuge && (
                               <span className="w-2.5 h-2.5 bg-primary-dark rounded-full animate-pulse shrink-0" title="Nouveau message" />
                             )}
                           </div>

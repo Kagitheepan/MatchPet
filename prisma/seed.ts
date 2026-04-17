@@ -11,7 +11,7 @@ try {
   // This is officially supported in many Prisma adapters
   const adapter = new PrismaMariaDb(connectionString)
   prisma = new PrismaClient({ adapter })
-} catch (err) {
+} catch {
   console.log("Fallback to default client initialization")
   prisma = new PrismaClient()
 }
@@ -30,7 +30,8 @@ async function main() {
       postalCode: '75001',
       latitude: 48.8566,
       longitude: 2.3522,
-      email_refuge: 'contact@refuge.fr'
+      email_refuge: 'contact@refuge.fr',
+      isVerified: true,
     }
   })
 
@@ -84,7 +85,20 @@ async function main() {
     await prisma.animal.upsert({
       where: { externalId: animal.externalId },
       update: {},
-      create: animal as any
+      create: {
+        externalId: animal.externalId,
+        name: animal.name,
+        species: animal.species,
+        breed: animal.breed,
+        age: animal.age,
+        gender: animal.gender,
+        size: animal.size,
+        goodWithChildren: animal.goodWithChildren,
+        goodWithDogs: animal.goodWithDogs,
+        goodWithCats: animal.goodWithCats,
+        needsGarden: animal.needsGarden,
+        refugeId: animal.refugeId
+      }
     })
   }
 

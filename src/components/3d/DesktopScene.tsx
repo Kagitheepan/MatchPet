@@ -9,7 +9,11 @@ import { Suspense, useState, useEffect } from "react";
 
 export default function DesktopScene({ model = "dog" }: { model?: "dog" | "cat" | "rabbit" | "all" }) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (!mounted) {
+      Promise.resolve().then(() => setMounted(true));
+    }
+  }, [mounted]);
 
   if (!mounted) return null; // Avoid hydration mismatch
 

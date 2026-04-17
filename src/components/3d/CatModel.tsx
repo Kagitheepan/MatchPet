@@ -1,10 +1,10 @@
 "use client";
 
 import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, ThreeElements } from "@react-three/fiber";
 import * as THREE from "three";
 
-export default function CatModel(props: any) {
+export default function CatModel(props: ThreeElements["group"]) {
   const tailRef = useRef<THREE.Group>(null);
   const headRef = useRef<THREE.Group>(null);
 

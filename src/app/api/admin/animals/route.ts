@@ -6,16 +6,21 @@ import crypto from 'crypto';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { refugeId, name, species, breed, age, gender, size, description, photos, goodWithChildren, goodWithDogs, goodWithCats, needsGarden, energyLevel } = body;
+    const { name, species, breed, age, gender, size, description, photos, goodWithChildren, goodWithDogs, goodWithCats, needsGarden, energyLevel } = body;
+    const refugeId = parseInt(body.refugeId);
 
-    if (!refugeId || !name || !species) {
-      return NextResponse.json({ error: 'Nom, espÃ¨ce et refuge sont requis' }, { status: 400 });
+    if (isNaN(refugeId) || !name || !species) {
+      return NextResponse.json({ error: 'Nom, espèce et refuge valide sont requis' }, { status: 400 });
     }
 
-    // VÃ©rifier que le refuge existe et est vÃ©rifiÃ©
+    // Vérifier que le refuge existe et est vérifié
     const refuge = await prisma.refuge.findUnique({ where: { id: refugeId } });
-    if (!refuge || !refuge.isVerified) {
-      return NextResponse.json({ error: 'Refuge non trouvÃ© ou non vÃ©rifiÃ©' }, { status: 403 });
+    if (!refuge) {
+      return NextResponse.json({ error: 'Refuge non trouvé' }, { status: 404 });
+    }
+    
+    if (!refuge.isVerified) {
+      return NextResponse.json({ error: 'Votre compte refuge doit être vérifié pour ajouter des animaux' }, { status: 403 });
     }
 
     // GÃ©nÃ©rer un externalId unique

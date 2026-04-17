@@ -45,7 +45,7 @@ export async function POST(request: Request) {
           userId: user.id,
           animalExternalId: animal?.externalId || String(animalId),
           animalName: animal?.name || animalName,
-          animalImage: (animal?.photos as any)?.[0] || animalImage || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500',
+          animalImage: (animal?.photos as string[])?.[0] || animalImage || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500',
           refugeId: animal?.refugeId || null,
           status: "pending"
         }

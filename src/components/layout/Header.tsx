@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import {usePathname} from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Search, Bookmark, User, Cat, Dog, FileText, Users, MessageCircle, ArrowLeft, Send, X } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import Image from "next/image";
+import { MessageCircle, ArrowLeft, Send, X, User } from "lucide-react";
 
 interface Adoption {
   id: number;
@@ -12,26 +12,59 @@ interface Adoption {
   image?: string;
   status: string;
   hasUnread: boolean;
-  requestDate: string;
+  userName: string;
+}
+
+interface Message {
+  id: number;
+  content: string;
+  senderType: string;
+  createdAt: string;
+}
+
+interface UserData {
+  email?: string;
+  firstName?: string;
+}
+
+interface RefugeData {
+  id: number;
+}
+
+interface RawAdoption {
+  id: number;
+  animalName?: string;
+  name?: string;
+  animalImage?: string;
+  image?: string;
+  status: string;
+  hasUnreadRefuge?: boolean;
+  hasUnread?: boolean;
+  user?: {
+    name?: string;
+    email?: string;
+  };
 }
 
 export default function Header() {
   const pathname = usePathname();
-  const [adoptions, setAdoptions] = useState<any[]>([]);
+  const [adoptions, setAdoptions] = useState<Adoption[]>([]);
   const [showChatList, setShowChatList] = useState(false);
-  const [activeAdoption, setActiveAdoption] = useState<any | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [activeAdoption, setActiveAdoption] = useState<Adoption | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [loadingMessages, setLoadingMessages] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const [user, setUser] = useState<any>(null);
-  const [refuge, setRefuge] = useState<any>(null);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [refuge, setRefuge] = useState<RefugeData | null>(null);
 
   useEffect(() => {
     const loggedUser = JSON.parse(localStorage.getItem('current_user') || 'null');
     const loggedRefuge = JSON.parse(localStorage.getItem('matchpet_refuge') || 'null');
-    setUser(loggedUser);
-    setRefuge(loggedRefuge);
+    Promise.resolve().then(() => {
+      setUser(loggedUser);
+      setRefuge(loggedRefuge);
+    });
     
     const fetchAdoptions = async () => {
       try {
@@ -49,17 +82,19 @@ export default function Header() {
         
         if (Array.isArray(data)) {
           // Normaliser les données car les APIs admin et user renvoient des formats légèrement différents
-          const normalized = data.map(a => ({
+          const normalized = data.map((a: RawAdoption) => ({
             id: a.id,
-            name: a.animalName || a.name,
+            name: a.animalName || a.name || "Animal",
             image: a.animalImage || a.image,
             status: a.status,
-            hasUnread: loggedRefuge ? a.hasUnreadRefuge : a.hasUnread,
+            hasUnread: loggedRefuge ? !!a.hasUnreadRefuge : !!a.hasUnread,
             userName: a.user?.name || a.user?.email || "Adoptant"
           }));
           setAdoptions(normalized);
         }
-      } catch {}
+      } catch {
+        // Error handling
+      }
     };
 
     fetchAdoptions();
@@ -81,7 +116,9 @@ export default function Header() {
           const res = await fetch(`/api/messages?adoptionId=${activeAdoption.id}&viewerType=${type}`);
           const data = await res.json();
           if (Array.isArray(data)) setMessages(data);
-        } catch {}
+        } catch {
+          // Error handling
+        }
       };
       const interval = setInterval(fetchMessages, 5000);
       return () => clearInterval(interval);
@@ -90,7 +127,7 @@ export default function Header() {
 
   const totalUnread = adoptions.filter(a => a.hasUnread).length;
 
-  const openChat = async (adoption: any) => {
+  const openChat = async (adoption: Adoption) => {
     setActiveAdoption(adoption);
     setLoadingMessages(true);
     try {
@@ -100,7 +137,9 @@ export default function Header() {
       if (Array.isArray(data)) setMessages(data);
       // Update local state to clear unread
       setAdoptions(prev => prev.map(a => a.id === adoption.id ? { ...a, hasUnread: false } : a));
-    } catch {}
+    } catch {
+      // Error handling
+    }
     setLoadingMessages(false);
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
@@ -126,41 +165,49 @@ export default function Header() {
       const data = await res.json();
       if (Array.isArray(data)) setMessages(data);
       setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    } catch {}
+    } catch {
+      // Error handling
+    }
   };
+
+  const navLinks = [
+    { href: '/', label: 'Accueil' },
+    { href: '/search', label: 'Recherche' },
+    { href: '/match', label: 'Matchs' },
+    { href: '/favorites', label: 'Mes Favoris' },
+    { href: '/adoptions', label: 'Mes Dossiers' },
+    { href: '/profile', label: 'Mon Profil' },
+    { href: '/associations', label: 'Associations' },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#3B3B3A] backdrop-blur-md border-b border-gray-200 shadow-sm flex justify-center">
       <div className="w-full max-w-7xl flex items-center justify-between p-4 md:px-8 relative">
-        <div className="flex items-center md:static relative left-1/2 -translate-x-1/2           │    
-│     md:translate-x-0 md:left-auto"> 
+        <div className="flex items-center md:static relative left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto"> 
         <Link href="/" className="flex items-center group">
           {/* Logo Mobile: avec titre */}
-          <img 
-            src="/logo-avectitre.png" 
-            alt="MatchPet Logo" 
-            className="h-12 w-auto  md:hidden"
-          />
+          <div className="md:hidden relative h-12 w-32">
+            <Image 
+              src="/logo-avectitre.png" 
+              alt="MatchPet Logo" 
+              fill
+              className="object-contain"
+            />
+          </div>
           {/* Logo PC: sans titre */}
-          <img 
-            src="/logo_sansntitre.png" 
-            alt="MatchPet Logo" 
-            className="hidden md:block h-20 w-auto"
-          />
+          <div className="hidden md:block relative h-20 w-20">
+            <Image 
+              src="/logo_sansntitre.png" 
+              alt="MatchPet Logo" 
+              fill
+              className="object-contain"
+            />
+          </div>
         </Link>
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          {[
-            { href: '/', label: 'Accueil' },
-            { href: '/search', label: 'Recherche' },
-            { href: '/match', label: 'Matchs' },
-            { href: '/favorites', label: 'Mes Favoris' },
-            { href: '/adoptions', label: 'Mes Dossiers' },
-            { href: '/profile', label: 'Mon Profil' },
-            { href: '/associations', label: 'Associations' },
-          ].map((link) => {
-            const pathname = usePathname();
+          {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
@@ -209,14 +256,19 @@ export default function Header() {
               {adoptions.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
                   <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                  <p className="font-medium">Aucun dossier d'adoption en cours.</p>
+                  <p className="font-medium">Aucun dossier d&apos;adoption en cours.</p>
                 </div>
               ) : (
                 adoptions.map(adoption => (
                   <button key={adoption.id} onClick={() => openChat(adoption)}
                     className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-50 transition-colors text-left group">
                     <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-gray-100">
-                      <img src={adoption.image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500"} alt={adoption.name} className="w-full h-full object-cover" />
+                      <Image 
+                        src={adoption.image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500"} 
+                        alt={adoption.name} 
+                        fill
+                        className="object-cover" 
+                      />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
@@ -244,7 +296,14 @@ export default function Header() {
                 <ArrowLeft className="w-6 h-6" />
               </button>
               <div className="flex items-center gap-3 flex-1">
-                <img src={activeAdoption.image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500"} alt={activeAdoption.name} className="w-10 h-10 rounded-full object-cover" />
+                <div className="relative w-10 h-10">
+                  <Image 
+                    src={activeAdoption.image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500"} 
+                    alt={activeAdoption.name} 
+                    fill
+                    className="rounded-full object-cover" 
+                  />
+                </div>
                 <div>
                   <h3 className="font-bold text-text-dark">{refuge ? activeAdoption.userName : activeAdoption.name}</h3>
                   <p className="text-primary-dark text-xs font-bold">{refuge ? "Adoptant" : "Refuge"}</p>
@@ -268,7 +327,7 @@ export default function Header() {
                   <p className="text-gray-400 font-medium">Posez vos questions au refuge ici !</p>
                 </div>
               ) : (
-                messages.map((msg: any) => {
+                messages.map((msg: Message) => {
                   const isUser = msg.senderType?.toUpperCase() === 'USER';
                   return (
                     <div key={msg.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>

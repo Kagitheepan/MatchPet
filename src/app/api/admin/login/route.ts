@@ -17,13 +17,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 });
     }
 
-    if (!refuge.isVerified) {
-      return NextResponse.json({ error: 'Votre compte n\'est pas encore vÃ©rifiÃ©. VÃ©rifiez votre boÃ®te mail.' }, { status: 403 });
-    }
-
     const isValid = await bcrypt.compare(password, refuge.password);
     if (!isValid) {
       return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 });
+    }
+
+    // Auto-verify if not verified (legacy fix)
+    if (!refuge.isVerified) {
+      await prisma.refuge.update({
+        where: { id: refuge.id },
+        data: { isVerified: true }
+      });
     }
 
     return NextResponse.json({

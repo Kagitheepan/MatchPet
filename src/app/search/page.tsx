@@ -2,14 +2,25 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Search as SearchIcon, MapPin, Heart, Filter, ChevronDown, Loader2 } from "lucide-react";
+import { Search as SearchIcon, MapPin, Heart, ChevronDown, Loader2 } from "lucide-react";
 import DesktopScene from "@/components/3d/DesktopScene";
 import { Button } from "@/components/ui/Button";
+
+interface Pet {
+  id: string;
+  type: string;
+  name: string;
+  breed: string;
+  age: string;
+  desc: string;
+  location: string;
+  image: string;
+}
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeType, setActiveType] = useState<string>("all");
-  const [animals, setAnimals] = useState<any[]>([]);
+  const [animals, setAnimals] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +30,18 @@ export default function SearchPage() {
         if (!response.ok) throw new Error("Failed to fetch animals");
         const data = await response.json();
         
-        const mappedData = data.map((animal: any) => {
+        interface AnimalData {
+          id: number | string;
+          name: string;
+          species: string;
+          breed?: string;
+          age?: string;
+          description?: string;
+          photos?: string[];
+          refuge?: { city?: string };
+        }
+        
+        const mappedData = data.map((animal: AnimalData) => {
           let type = "autre";
           const speciesLower = animal.species?.toLowerCase() || '';
           
@@ -186,7 +208,7 @@ export default function SearchPage() {
             <div className="col-span-full py-32 flex flex-col items-center justify-center text-center bg-white rounded-[3rem] border border-gray-50 shadow-sm">
               <div className="w-24 h-24 mb-6 relative opacity-20"><SearchIcon className="w-full h-full text-gray-400" /></div>
               <h3 className="font-cursive text-4xl font-bold text-text-dark mb-4">Aucun animal trouvé</h3>
-              <p className="text-gray-500 font-medium text-lg max-w-sm">Essayez de modifier vos filtres d'espèce ou la distance de recherche.</p>
+              <p className="text-gray-500 font-medium text-lg max-w-sm">Essayez de modifier vos filtres d&apos;espèce ou la distance de recherche.</p>
             </div>
           )}
         </div>
