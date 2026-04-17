@@ -320,7 +320,7 @@ export default function AssociationsPage() {
     }
   };
 
-  const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
+  const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
     pending: { label: "En attente", color: "bg-amber-100 text-amber-700", icon: Clock },
     reviewing: { label: "En cours", color: "bg-blue-100 text-blue-700", icon: Eye },
     approved: { label: "Approuvé", color: "bg-green-100 text-green-700", icon: CheckCircle },

@@ -26,6 +26,8 @@ export async function POST(request: Request) {
     // GÃ©nÃ©rer un externalId unique
     const externalId = `MP-${refugeId}-${crypto.randomUUID().slice(0, 8)}`;
 
+    console.log('Attempting to create animal:', { name, species, refugeId });
+
     const animal = await prisma.animal.create({
       data: {
         externalId,
@@ -37,11 +39,11 @@ export async function POST(request: Request) {
         size: size || null,
         description: description || null,
         photos: photos || null,
-        goodWithChildren: goodWithChildren || false,
-        goodWithDogs: goodWithDogs || false,
-        goodWithCats: goodWithCats || false,
-        needsGarden: needsGarden || false,
-        energyLevel: energyLevel || null,
+        goodWithChildren: Boolean(goodWithChildren),
+        goodWithDogs: Boolean(goodWithDogs),
+        goodWithCats: Boolean(goodWithCats),
+        needsGarden: Boolean(needsGarden),
+        energyLevel: energyLevel || "Medium",
         refugeId,
       },
     });

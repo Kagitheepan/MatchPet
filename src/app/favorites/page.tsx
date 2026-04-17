@@ -5,6 +5,8 @@ import Image from "next/image";
 import { Heart, MapPin, HeartCrack } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import AdoptionAwarenessModal from "@/components/ui/AdoptionAwarenessModal";
 
 interface FavoritePet {
   id: string;
@@ -15,8 +17,11 @@ interface FavoritePet {
 }
 
 export default function FavoritesPage() {
+  const router = useRouter();
   const [animals, setAnimals] = useState<FavoritePet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPet, setSelectedPet] = useState<FavoritePet | null>(null);
+  const [showAwarenessModal, setShowAwarenessModal] = useState(false);
 
   useEffect(() => {
     const savedLikesStr = localStorage.getItem('liked_animals') || '[]';
@@ -36,6 +41,18 @@ export default function FavoritesPage() {
     const updated = animals.filter(a => a.id !== id);
     setAnimals(updated);
     localStorage.setItem('liked_animals', JSON.stringify(updated));
+  };
+
+  const handleAdoptClick = (pet: FavoritePet) => {
+    setSelectedPet(pet);
+    setShowAwarenessModal(true);
+  };
+
+  const confirmAdoption = () => {
+    if (selectedPet) {
+      router.push(`/adopt?animalId=${selectedPet.id}&name=${encodeURIComponent(selectedPet.name)}`);
+    }
+    setShowAwarenessModal(false);
   };
 
   return (
@@ -64,11 +81,13 @@ export default function FavoritesPage() {
                 <h3 className="font-cursive text-[2rem] font-bold text-text-dark leading-none mb-1">{pet.name}</h3>
                 <p className="text-[14px] text-gray-500 font-medium leading-relaxed mb-6 flex-1 line-clamp-2">{pet.description}</p>
                 
-                <Link href={`/adopt?animalId=${pet.id}&name=${encodeURIComponent(pet.name)}`}>
-                  <Button variant="primary" className="w-full text-xl h-[3.2rem] shadow-md transition-all mt-auto bg-primary text-primary-dark hover:bg-primary-dark hover:text-white">
-                    L&apos;adopter
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={() => handleAdoptClick(pet)}
+                  variant="primary" 
+                  className="w-full text-xl h-[3.2rem] shadow-md transition-all mt-auto bg-primary text-primary-dark hover:bg-primary-dark hover:text-white"
+                >
+                  L&apos;adopter
+                </Button>
               </div>
             </div>
           ))}
@@ -85,6 +104,13 @@ export default function FavoritesPage() {
           )}
         </div>
       </div>
+
+      <AdoptionAwarenessModal 
+        isOpen={showAwarenessModal}
+        onClose={() => setShowAwarenessModal(false)}
+        onConfirm={confirmAdoption}
+        animalName={selectedPet?.name || ""}
+      />
     </div>
   );
 }

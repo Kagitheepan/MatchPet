@@ -1,4 +1,4 @@
-const React = require('react');
+import React from 'react';
 
 const MockComponent = React.forwardRef(({ children, ...props }, ref) => {
   // Remove motion-specific props to avoid React warnings

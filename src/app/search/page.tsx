@@ -5,6 +5,8 @@ import Image from "next/image";
 import { Search as SearchIcon, MapPin, Heart, ChevronDown, Loader2 } from "lucide-react";
 import DesktopScene from "@/components/3d/DesktopScene";
 import { Button } from "@/components/ui/Button";
+import { useRouter } from "next/navigation";
+import AdoptionAwarenessModal from "@/components/ui/AdoptionAwarenessModal";
 
 interface Pet {
   id: string;
@@ -18,10 +20,13 @@ interface Pet {
 }
 
 export default function SearchPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeType, setActiveType] = useState<string>("all");
   const [animals, setAnimals] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [showAwarenessModal, setShowAwarenessModal] = useState(false);
 
   useEffect(() => {
     const fetchAnimals = async () => {
@@ -72,6 +77,18 @@ export default function SearchPage() {
     };
     fetchAnimals();
   }, []);
+
+  const handleAdoptClick = (pet: Pet) => {
+    setSelectedPet(pet);
+    setShowAwarenessModal(true);
+  };
+
+  const confirmAdoption = () => {
+    if (selectedPet) {
+      router.push(`/adopt?animalId=${selectedPet.id}&name=${encodeURIComponent(selectedPet.name)}`);
+    }
+    setShowAwarenessModal(false);
+  };
 
   const filtered = animals.filter(pet => {
     if (activeType !== "all" && pet.type !== activeType) return false;
@@ -197,8 +214,12 @@ export default function SearchPage() {
                 </div>
                 <p className="text-[14px] text-primary-dark font-extrabold mb-3">{pet.breed}</p>
                 <p className="text-[14px] text-gray-500 font-medium leading-relaxed mb-6 flex-1 line-clamp-2">{pet.desc}</p>
-                <Button variant="primary" className="w-full text-xl h-[3.2rem] shadow-md group-hover:shadow-lg transition-all mt-auto bg-secondary text-white hover:bg-secondary-dark">
-                  Le découvrir
+                <Button 
+                  onClick={() => handleAdoptClick(pet)}
+                  variant="primary" 
+                  className="w-full text-xl h-[3.2rem] shadow-md group-hover:shadow-lg transition-all mt-auto bg-secondary text-white hover:bg-secondary-dark"
+                >
+                  L&apos;adopter
                 </Button>
               </div>
             </div>
@@ -213,6 +234,13 @@ export default function SearchPage() {
           )}
         </div>
       </div>
+
+      <AdoptionAwarenessModal 
+        isOpen={showAwarenessModal}
+        onClose={() => setShowAwarenessModal(false)}
+        onConfirm={confirmAdoption}
+        animalName={selectedPet?.name || ""}
+      />
     </div>
   );
 }

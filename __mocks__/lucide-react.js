@@ -1,4 +1,4 @@
-const React = require('react');
+import React from 'react';
 
 const MockIcon = React.forwardRef((props, ref) => {
   const { size, color, strokeWidth, ...rest } = props;
