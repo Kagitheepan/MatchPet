@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CheckCircle2, Clock, MapPin, XCircle, FileText } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { getFallbackImage } from "@/lib/utils";
 
 type AdoptionStatus = 'pending' | 'reviewing' | 'approved' | 'rejected';
 
@@ -114,7 +115,7 @@ export default function AdoptionsPage() {
                   {/* Animal Info */}
                   <div className="flex gap-4 md:w-1/3 w-full shrink-0">
                     <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-[1.2rem] overflow-hidden bg-gray-100 shrink-0">
-                      <Image src={adoption.image || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500'} alt={adoption.name} fill className="object-cover" />
+                      <Image src={adoption.image || getFallbackImage()} alt={adoption.name} fill className="object-cover" />
                     </div>
                     <div className="flex flex-col justify-center">
                       <h3 className="font-cursive text-2xl md:text-3xl font-bold text-text-dark leading-none mb-1">

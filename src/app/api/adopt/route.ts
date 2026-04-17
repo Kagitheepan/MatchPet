@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { getFallbackImage } from "@/lib/utils";
 
 export async function POST(request: Request) {
   try {
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
             { id: !isNaN(Number(animalId)) ? Number(animalId) : -1 }
           ]
         },
-        select: { id: true, externalId: true, refugeId: true, name: true, photos: true},
+        select: { id: true, externalId: true, refugeId: true, name: true, photos: true, species: true },
       });
 
       await prisma.adoption.create({
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
           userId: user.id,
           animalExternalId: animal?.externalId || String(animalId),
           animalName: animal?.name || animalName,
-          animalImage: (animal?.photos as string[])?.[0] || animalImage || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500',
+          animalImage: (animal?.photos as string[])?.[0] || animalImage || getFallbackImage(animal?.species),
           refugeId: animal?.refugeId || null,
           status: "pending"
         }

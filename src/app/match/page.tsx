@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { getFallbackImage } from "@/lib/utils";
 
 interface MappedAnimal {
   id: string;
@@ -80,9 +81,9 @@ export default function MatchPage() {
           species: animal.species || 'Unknown',
           description: animal.description || "Aucune description disponible.",
           location: animal.refuge?.city || "Refuge",
-          image: (Array.isArray(animal.photos) && animal.photos.length > 0) 
-            ? animal.photos[0] 
-            : "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?q=80&w=800&auto=format&fit=crop",
+          image: (Array.isArray(animal.photos) && animal.photos.length > 0)
+            ? animal.photos[0]
+            : getFallbackImage(animal.species),
           distance: "Proche de vous",
         }));
 

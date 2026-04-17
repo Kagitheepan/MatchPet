@@ -7,6 +7,7 @@ import DesktopScene from "@/components/3d/DesktopScene";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import AdoptionAwarenessModal from "@/components/ui/AdoptionAwarenessModal";
+import { getFallbackImage } from "@/lib/utils";
 
 interface Pet {
   id: string;
@@ -65,7 +66,7 @@ export default function SearchPage() {
             location: animal.refuge?.city || "Refuge",
             image: (Array.isArray(animal.photos) && animal.photos.length > 0) 
               ? animal.photos[0] 
-              : "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=500"
+              : getFallbackImage(animal.species)
           };
         });
         setAnimals(mappedData);

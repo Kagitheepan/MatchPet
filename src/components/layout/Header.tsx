@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { MessageCircle, ArrowLeft, Send, X, User } from "lucide-react";
+import { getFallbackImage } from "@/lib/utils";
 
 interface Adoption {
   id: number;
@@ -264,7 +265,7 @@ export default function Header() {
                     className="w-full flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-50 transition-colors text-left group">
                     <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-gray-100">
                       <Image 
-                        src={adoption.image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500"} 
+                        src={adoption.image || getFallbackImage()} 
                         alt={adoption.name} 
                         fill
                         className="object-cover" 
@@ -298,7 +299,7 @@ export default function Header() {
               <div className="flex items-center gap-3 flex-1">
                 <div className="relative w-10 h-10">
                   <Image 
-                    src={activeAdoption.image || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500"} 
+                    src={activeAdoption.image || getFallbackImage()} 
                     alt={activeAdoption.name} 
                     fill
                     className="rounded-full object-cover" 

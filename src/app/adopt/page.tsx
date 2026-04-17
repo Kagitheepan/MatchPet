@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Check, Heart } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { getFallbackImage } from "@/lib/utils";
 
 interface User {
   firstName: string;
@@ -93,7 +94,7 @@ function AdoptForm() {
           password: "existing_user_hidden_password",
           animalName: animalName,
           animalId: id,
-          animalImage: adoptedAnimal?.image || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500'
+          animalImage: adoptedAnimal?.image || getFallbackImage()
         };
         
         localStorage.setItem('current_user', JSON.stringify(loginData.user));
@@ -107,7 +108,7 @@ function AdoptForm() {
           password: formData.get("password") as string,
           animalName: animalName,
           animalId: id,
-          animalImage: adoptedAnimal?.image || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500'
+          animalImage: adoptedAnimal?.image || getFallbackImage()
         };
 
         localStorage.setItem('current_user', JSON.stringify({

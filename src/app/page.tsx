@@ -4,6 +4,7 @@ import { Heart } from "lucide-react";
 import DesktopScene from "@/components/3d/DesktopScene";
 import { prisma } from "@/lib/prisma";
 import HomeMatcherButton from "@/components/ui/HomeMatcherButton";
+import { getFallbackImage } from "@/lib/utils";
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
