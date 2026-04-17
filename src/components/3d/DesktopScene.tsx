@@ -36,7 +36,7 @@ export default function DesktopScene({ model = "dog" }: { model?: "dog" | "cat" 
             {/* Dog */}
             {(model === "dog" || model === "all") && (
               <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5} floatingRange={[0, 0.2]}>
-                <Dog position={model === "all" ? [-2, 0, 0] : [0, 0, 0]} rotation={[0, Math.PI / 6, 0]} scale={model === "all" ? 1 : 1} />
+                <Dog position={model === "all" ? [-2, 0, 0] : [0, 0, 0]} rotation={[0, 0, 0]} scale={model === "all" ? 0.032 : 0.032} />
               </Float>
             )}
             
@@ -62,8 +62,7 @@ export default function DesktopScene({ model = "dog" }: { model?: "dog" | "cat" 
         <OrbitControls 
           enablePan={false}
           enableZoom={true}
-          autoRotate={true}
-          autoRotateSpeed={0.5}
+          autoRotate={false}
           minPolarAngle={Math.PI / 3}
           maxPolarAngle={Math.PI / 2.1}
           minDistance={4}
