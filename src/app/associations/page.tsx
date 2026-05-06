@@ -648,7 +648,7 @@ export default function AssociationsPage() {
                 </div>
 
                 <Button type="submit" variant="primary" className="w-full h-12 md:h-14 text-base md:text-lg font-bold shadow-md hover:scale-[1.02] transition-transform mt-2" disabled={submitting}>
-                  {submitting ? "Ajout en cours..." : "Ajouter l&apos;animal"}
+                  {submitting ? "Ajout en cours..." : "Ajouter l'animal"}
                 </Button>
               </form>
             </div>
