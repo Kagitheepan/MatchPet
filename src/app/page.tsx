@@ -55,7 +55,7 @@ export default async function Home() {
 
       {/* Derniers arrivés Section */}
       <section className="w-full max-w-4xl mx-auto px-4 md:px-8 py-10 md:py-16">
-        <h2 className="font-cursive text-4xl md:text-5xl text-[#e8a8a8] font-bold mb-8 md:mb-10">
+        <h2 className="font-cursive text-4xl md:text-5xl text-secondary-dark font-bold mb-8 md:mb-10">
           Derniers arrivés
         </h2>
         
@@ -95,7 +95,7 @@ export default async function Home() {
 
       {/* Nos Articles Section */}
       <section className="hidden md:block w-full max-w-4xl mx-auto px-4 md:px-8 py-6 mb-20">
-        <h2 className="font-cursive text-4xl md:text-5xl text-[#e8a8a8] font-bold mb-8 md:mb-10">
+        <h2 className="font-cursive text-4xl md:text-5xl text-secondary-dark font-bold mb-8 md:mb-10">
           Nos articles
         </h2>
         
