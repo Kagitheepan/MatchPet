@@ -391,7 +391,7 @@ export default function AssociationsPage() {
                 </div>
                 {authError && <p className="text-red-500 font-medium text-sm text-center">{authError}</p>}
                 <Button type="submit" variant="primary" className="w-full h-14 text-lg font-bold mt-2 shadow-md hover:scale-[1.02] transition-transform" disabled={submitting}>
-                  {submitting ? "..." : "S&apos;inscrire"}
+                  {submitting ? "..." : "S'inscrire"}
                 </Button>
               </form>
             )}
