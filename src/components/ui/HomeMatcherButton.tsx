@@ -17,7 +17,7 @@ export default function HomeMatcherButton() {
     <div className="absolute bottom-5 right-5 md:bottom-8 md:right-8 z-20">
       <button 
         onClick={() => setShowModal(true)}
-        className="bg-secondary-dark text-white font-cursive text-3xl md:text-4xl px-8 py-3 rounded-full shadow-lg hover:scale-105 transition-transform border border-white/20 hover:shadow-xl"
+        className="bg-secondary text-text-dark font-cursive text-3xl md:text-4xl px-8 py-3 rounded-full shadow-lg hover:scale-105 transition-transform hover:shadow-xl"
       >
         Matcher !
       </button>

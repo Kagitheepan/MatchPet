@@ -15,7 +15,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
           "rounded-[2rem] shadow-[0_4px_10px_rgba(0,0,0,0.05)] active:scale-[0.98]", // default styling matching mockups
           {
-            "bg-secondary-dark text-white hover:bg-secondary font-cursive text-2xl": variant === "primary",
+            "bg-secondary text-text-dark hover:brightness-95 font-cursive text-2xl": variant === "primary",
             "bg-primary text-text-dark hover:bg-primary-dark": variant === "secondary",
             "bg-white text-text-dark hover:bg-gray-50 border border-gray-100": variant === "muted",
             "border-2 border-primary text-text-dark hover:bg-primary/10": variant === "outline",

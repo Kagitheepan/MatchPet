@@ -79,7 +79,7 @@ export default async function Home() {
                    {animal.age ? animal.age : "Âge non spécifié"}
                  </p>
                  <Link href={`/match`} className="w-[85%] mt-auto flex justify-center">
-                   <button className="bg-secondary-dark text-white font-cursive text-2xl px-6 py-2 rounded-full shadow-md hover:bg-secondary transition-colors w-full">
+                   <button className="bg-secondary text-text-dark font-cursive text-2xl px-6 py-2 rounded-full shadow-md hover:brightness-95 transition-all w-full">
                      En savoir +
                    </button>
                  </Link>
@@ -111,7 +111,7 @@ export default async function Home() {
              <p className="text-[15px] text-text-dark font-medium my-6 text-center px-4 leading-relaxed">
                Lutter efficacement<br/>contre l&apos;obésité.
              </p>
-             <button className="bg-secondary-dark text-white font-cursive text-2xl px-6 py-2 rounded-full shadow-md mt-auto hover:bg-secondary transition-colors w-[85%]">
+             <button className="bg-secondary text-text-dark font-cursive text-2xl px-6 py-2 rounded-full shadow-md mt-auto hover:brightness-95 transition-all w-[85%]">
                En savoir +
              </button>
            </div>
@@ -127,7 +127,7 @@ export default async function Home() {
              <p className="text-[15px] text-text-dark font-medium my-6 text-center px-4 leading-relaxed">
                Des promenades sportives<br/>organisées en 77.
              </p>
-             <button className="bg-secondary-dark text-white font-cursive text-2xl px-6 py-2 rounded-full shadow-md mt-auto hover:bg-secondary transition-colors w-[85%]">
+             <button className="bg-secondary text-text-dark font-cursive text-2xl px-6 py-2 rounded-full shadow-md mt-auto hover:brightness-95 transition-all w-[85%]">
                En savoir +
              </button>
            </div>
@@ -143,7 +143,7 @@ export default async function Home() {
              <p className="text-[15px] text-text-dark font-medium my-6 text-center px-4 leading-relaxed">
                Prendre soin du<br/>pelage de son animal.
              </p>
-             <button className="bg-secondary-dark text-white font-cursive text-2xl px-6 py-2 rounded-full shadow-md mt-auto hover:bg-secondary transition-colors w-[85%]">
+             <button className="bg-secondary text-text-dark font-cursive text-2xl px-6 py-2 rounded-full shadow-md mt-auto hover:brightness-95 transition-all w-[85%]">
                En savoir +
              </button>
            </div>

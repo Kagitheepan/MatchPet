@@ -118,7 +118,7 @@ export default function SearchPage() {
             <button 
               key={type}
               onClick={() => setActiveType(type)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold capitalize whitespace-nowrap transition-all border shrink-0 ${activeType === type ? 'bg-secondary text-white border-secondary-dark shadow-md scale-95' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
+              className={`px-5 py-2.5 rounded-full text-sm font-semibold capitalize whitespace-nowrap transition-all border shrink-0 ${activeType === type ? 'bg-secondary text-text-dark border-secondary shadow-md scale-95' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
             >
               {type === "all" ? "Tous" : type + "s"}
             </button>
@@ -218,7 +218,7 @@ export default function SearchPage() {
                 <Button 
                   onClick={() => handleAdoptClick(pet)}
                   variant="primary" 
-                  className="w-full text-xl h-[3.2rem] shadow-md group-hover:shadow-lg transition-all mt-auto bg-secondary text-white hover:bg-secondary-dark"
+                  className="w-full text-xl h-[3.2rem] shadow-md group-hover:shadow-lg transition-all mt-auto bg-secondary text-text-dark hover:brightness-95"
                 >
                   L&apos;adopter
                 </Button>
