@@ -30,9 +30,11 @@ export default function Footer() {
         {/* Legal */}
         <div className="col-span-1 flex flex-col items-center md:items-start">
           <h3 className="font-cursive text-2xl text-[#f4c4c4] mb-3 md:mb-5">Informations</h3>
-          <Link href="#" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Mentions légales</Link>
-          <Link href="#" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Confidentialité</Link>
-          <Link href="#" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Contact</Link>
+          <Link href="/mentions-legales" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Mentions légales</Link>
+          <Link href="/cgu" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">CGU</Link>
+          <Link href="/confidentialite" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Confidentialité</Link>
+          <Link href="/cookies" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Cookies</Link>
+          <a href="mailto:contact@matchpet.fr" className="text-gray-300 font-medium hover:text-white transition-colors mb-2 text-sm xl:text-base">Contact</a>
         </div>
         
         {/* Social */}

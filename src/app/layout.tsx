@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
+import CookieBanner from "@/components/layout/CookieBanner";
 
 const quicksand = Quicksand({
   variable: "--font-quicksand",
@@ -34,6 +35,7 @@ export default function RootLayout({
         </main>
         <BottomNav />
         <Footer />
+        <CookieBanner />
       </body>
     </html>
   );
