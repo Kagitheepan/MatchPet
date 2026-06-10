@@ -31,7 +31,7 @@ export default function AdoptionAwarenessModal({ isOpen, onClose, onConfirm, ani
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            className="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden overflow-y-auto max-h-[90vh]"
+            className="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden overflow-y-auto max-h-[85svh] md:max-h-[90vh]"
           >
             {/* Close Button */}
             <button 
@@ -41,7 +41,7 @@ export default function AdoptionAwarenessModal({ isOpen, onClose, onConfirm, ani
               <X className="w-6 h-6 text-gray-400" />
             </button>
 
-            <div className="p-8 md:p-10">
+            <div className="p-6 md:p-10">
               {/* Header Icon */}
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-8 mx-auto">
                 <ShieldAlert className="w-10 h-10 text-primary-dark" />
