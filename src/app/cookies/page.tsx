@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Cookie, Eye, ShieldCheck, Clock } from "lucide-react";
+import { Cookie, ShieldCheck, Clock } from "lucide-react";
 import CookieSettings from "@/components/layout/CookieSettings";
 
 export const metadata: Metadata = {

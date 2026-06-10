@@ -19,12 +19,13 @@ export default function CookieSettings() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPrefs({
           essential: true,
           analytics: !!parsed.analytics,
           marketing: !!parsed.marketing,
         });
-      } catch (e) {
+      } catch {
         // Fallback
       }
     }

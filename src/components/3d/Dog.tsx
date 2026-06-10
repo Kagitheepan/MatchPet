@@ -73,7 +73,6 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
       Object.values(actions).forEach(a => a?.stop())
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, animations])
 
   return (

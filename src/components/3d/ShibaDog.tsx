@@ -35,6 +35,7 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
   const { scene, animations } = useGLTF('/shiba_dog.glb')
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { nodes, materials } = useGraph(clone) as unknown as GLTFResult
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { actions } = useAnimations(animations, group)
   return (
     <group ref={group} {...props} dispose={null}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Cookie, X, Shield, Info, Check } from "lucide-react";
+import { Cookie } from "lucide-react";
 import Link from "next/link";
 
 export type CookiePreferences = {
