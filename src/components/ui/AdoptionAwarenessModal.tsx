@@ -41,7 +41,7 @@ export default function AdoptionAwarenessModal({ isOpen, onClose, onConfirm, ani
               <X className="w-6 h-6 text-gray-400" />
             </button>
 
-            <div className="p-6 md:p-10 overflow-y-auto flex-1">
+            <div className="p-6 pb-8 md:p-10 overflow-y-auto flex-1 min-h-0">
               {/* Header Icon */}
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-8 mx-auto">
                 <ShieldAlert className="w-10 h-10 text-primary-dark" />
