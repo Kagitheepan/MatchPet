@@ -60,10 +60,10 @@ export default function AdoptionsPage() {
 
   const getStatusInfo = (status: AdoptionStatus) => {
     switch(status) {
-      case 'pending':
-        return { label: "En attente d&apos;examen", color: "text-amber-600", bg: "bg-amber-100", bar: "bg-amber-500", progress: 25, icon: Clock };
-      case 'reviewing':
-        return { label: "Dossier en cours d&apos;étude", color: "text-blue-600", bg: "bg-blue-100", bar: "bg-blue-500", progress: 60, icon: FileText };
+      case "pending":
+        return { label: "En attente d'examen", color: "text-amber-600", bg: "bg-amber-100", bar: "bg-amber-500", progress: 25, icon: Clock };
+      case "reviewing":
+        return { label: "Dossier en cours d'étude", color: "text-blue-600", bg: "bg-blue-100", bar: "bg-blue-500", progress: 60, icon: FileText };
       case 'approved':
         return { label: "Adoption validée", color: "text-green-600", bg: "bg-green-100", bar: "bg-green-500", progress: 100, icon: CheckCircle2 };
       case 'rejected':

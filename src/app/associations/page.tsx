@@ -371,9 +371,9 @@ export default function AssociationsPage() {
               </form>
             ) : (
               <form onSubmit={handleRegister} className="flex flex-col gap-4">
-                <input value={regName} onChange={e => setRegName(e.target.value)} placeholder="Nom de l&apos;association *" required type="text"
+                <input value={regName} onChange={e => setRegName(e.target.value)} placeholder="Nom de l'association *" required type="text"
                   className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary-dark outline-none font-medium transition-all" />
-                <input value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="Email de l&apos;association *" required type="email"
+                <input value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="Email de l'association *" required type="email"
                   className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary-dark outline-none font-medium transition-all" />
                 <input value={regPassword} onChange={e => setRegPassword(e.target.value)} placeholder="Mot de passe *" required type="password"
                   className="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-primary-dark outline-none font-medium transition-all" />
@@ -430,7 +430,7 @@ export default function AssociationsPage() {
           {([
             { id: "animals" as TabType, label: "Mes Animaux", icon: Users },
             { id: "addAnimal" as TabType, label: "Ajouter un Animal", icon: PlusCircle },
-            { id: "adoptions" as TabType, label: "Dossiers d&apos;Adoption", icon: FileText },
+            { id: "adoptions" as TabType, label: "Dossiers d'Adoption", icon: FileText },
             { id: "messages" as TabType, label: "Messages", icon: MessageCircle },
           ]).map(tab => (
             <button key={tab.id} onClick={() => { setActiveTab(tab.id); setSuccessMsg(""); }}
@@ -536,7 +536,7 @@ export default function AssociationsPage() {
               <h2 className="font-cursive text-2xl md:text-3xl font-bold text-text-dark mb-6 md:mb-8 text-center">Nouvel Animal</h2>
               {successMsg && <p className="text-green-600 font-medium text-sm text-center mb-6 bg-green-50 p-3 rounded-xl">{successMsg}</p>}
               <form onSubmit={handleAddAnimal} className="flex flex-col gap-4 md:gap-5">
-                <input value={animalName} onChange={e => setAnimalName(e.target.value)} placeholder="Nom de l&apos;animal *" required
+                <input value={animalName} onChange={e => setAnimalName(e.target.value)} placeholder="Nom de l'animal *" required
                   className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all text-sm md:text-base" />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -571,7 +571,7 @@ export default function AssociationsPage() {
                   </select>
                 </div>
 
-                <textarea value={animalDescription} onChange={e => setAnimalDescription(e.target.value)} placeholder="Description de l&apos;animal..."
+                <textarea value={animalDescription} onChange={e => setAnimalDescription(e.target.value)} placeholder="Description de l'animal..."
                   rows={3} className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all resize-none text-sm md:text-base" />
 
                 <div className="space-y-3">
@@ -613,7 +613,7 @@ export default function AssociationsPage() {
                         Ajouter depuis PC
                       </label>
                     </div>
-                    <input value={animalPhotoUrl} onChange={e => setAnimalPhotoUrl(e.target.value)} placeholder="Ou URL d&apos;image"
+                    <input value={animalPhotoUrl} onChange={e => setAnimalPhotoUrl(e.target.value)} placeholder="Ou URL d'image"
                       className="w-full p-3 md:p-4 rounded-xl border border-gray-200 bg-white focus:border-primary-dark outline-none font-medium transition-all text-sm md:text-base" />
                   </div>
                 </div>

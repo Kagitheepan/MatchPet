@@ -172,7 +172,7 @@ function AdoptForm() {
         <p className="text-gray-500 font-medium mb-8 relative z-10 text-sm md:text-base">
           {sessionUser ? 
             "Vous êtes déjà connecté ! Cliquez simplement pour finaliser votre demande avec les coordonnées de votre profil." :
-            "Pour finaliser votre demande d&apos;adoption, veuillez vous identifier ou créer votre compte."
+            "Pour finaliser votre demande d'adoption, veuillez vous identifier ou créer votre compte."
           }
         </p>
 
@@ -233,7 +233,7 @@ function AdoptForm() {
           )}
 
           <Button disabled={isSubmitting} type="submit" variant="primary" className="w-full text-xl h-[3.5rem] md:h-[4rem] group mt-4 shadow-md hover:shadow-lg transition-all rounded-[2rem] disabled:opacity-70 disabled:cursor-not-allowed">
-            {isSubmitting ? "Envoi en cours..." : (isLoginMode ? "S&apos;identifier et Adopter" : "Confirmer l&apos;adoption")}
+            {isSubmitting ? "Envoi en cours..." : (isLoginMode ? "S'identifier et Adopter" : "Confirmer l'adoption")}
             {!isSubmitting && <Heart className="w-5 h-5 ml-2 group-hover:scale-110 transition-transform fill-current text-primary-dark group-hover:text-white" />}
           </Button>
         </form>
