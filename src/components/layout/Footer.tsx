@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Instagram, Facebook, Music2, Cat, Dog, Heart } from "lucide-react";
+import Image from "next/image";
+import { Instagram, Facebook, Music2, Heart } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -9,11 +10,13 @@ export default function Footer() {
         {/* Brand */}
         <div className="col-span-1 md:col-span-1 flex flex-col items-center md:items-start text-secondary">
           <Link href="/" className="flex items-center gap-2 mb-4">
-            <div className="flex -mb-1 text-white">
-              <Dog className="w-10 h-10" strokeWidth={1.5} />
-              <Cat className="w-10 h-10 -ml-2" strokeWidth={1.5} />
-            </div>
-            <span className="font-cursive text-3xl font-bold tracking-wide text-white mt-1">MatchPet</span>
+            <Image 
+              src="/logo-avectitre.png" 
+              alt="MatchPet" 
+              width={180} 
+              height={50} 
+              className="h-12 w-auto object-contain"
+            />
           </Link>
           <p className="text-gray-300 text-sm xl:text-base text-center md:text-left leading-relaxed font-medium">
             Trouvez votre compagnon idéal près de chez vous. Adoptez, rencontrez et partagez des moments uniques.
